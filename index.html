@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus 2.0 Sci-Fi Soundscape</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <div class="bg-gray-900 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-800 text-center neon-glow">
+        <h1 class="text-2xl font-black text-emerald-400 mb-1 tracking-wider uppercase">⚡ Focus 2.0 Vibe Engine</h1>
+        <p class="text-xs text-gray-500 mb-6">Generátor futuristického zvuku podle zrychlení auta</p>
+
+        <!-- INDIKÁTOR AKCELERACE -->
+        <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 mb-6">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400 block mb-2">Aktuální přetížení (G-Force)</span>
+            <div class="text-4xl font-black text-mono text-white transition-all duration-75" id="gForceVal">0.00 G</div>
+            
+            <!-- Vizuální lišta zrychlení -->
+            <div class="w-full bg-gray-850 h-3 rounded-full mt-4 overflow-hidden border border-gray-800">
+                <div id="accelBar" class="bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 h-full w-0 transition-all duration-75"></div>
+            </div>
+        </div>
+
+        <!-- VÝBĚR ZVUKU -->
+        <div class="mb-6 text-left">
+            <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Zvolit režim pohonu</label>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="setSoundMode('hyperdrive')" id="btn-hyperdrive" class="sound-btn p-3 bg-emerald-500 text-gray-950 font-bold rounded-xl text-xs transition border border-emerald-400">
+                    🚀 Hyperdrive (Star Wars)
+                </button>
+                <button onclick="setSoundMode('cyber')" id="btn-cyber" class="sound-btn p-3 bg-gray-800 text-gray-400 font-bold rounded-xl text-xs transition border border-gray-750 hover:bg-gray-750">
+                    🤖 CyberSynth 2077
+                </button>
+            </div>
+        </div>
+
+        <!-- HLAVNÍ OVLÁDACÍ TLAČÍTKO -->
+        <button id="startBtn" onclick="initAudio()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-gray-950 font-black py-4 px-6 rounded-2xl transition duration-200 transform active:scale-[0.97] tracking-wider uppercase text-sm shadow-lg shadow-emerald-500/20">
+            🔴 Nastartovat zvukový modul
+        </button>
+
+        <!-- INFO POZNÁMKA -->
+        <p class="text-[10px] text-gray-500 mt-4">
+            Upozornění: Pro správnou funkci musí být telefon pevně uchycen v držáku auta a rádio propojeno přes AUX/Bluetooth. Na zařízeních iOS (Apple) bude vyžádáno povolení přístupu k pohybovým senzorům.
+        </p>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let biquadFilter = null;
+        let isRunning = false;
+        let currentMode = 'hyperdrive';
+        
+        // Nastavení základních zvukových parametrů pro režimy
+        const soundSpecs = {
+            hyperdrive: { baseFreq: 60, maxFreq: 280, type: 'sawtooth', filterFreq: 800 },
+            cyber: { baseFreq: 45, maxFreq: 180, type: 'triangle', filterFreq: 400 }
+        };
+
+        function setSoundMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.sound-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-500', 'text-gray-950', 'border-emerald-400');
+                btn.classList.add('bg-gray-800', 'text-gray-400', 'border-gray-750');
+            });
+            const activeBtn = document.getElementById(`btn-${mode}`);
+            activeBtn.classList.remove('bg-gray-800', 'text-gray-400', 'border-gray-750');
+            activeBtn.classList.add('bg-emerald-500', 'text-gray-950', 'border-emerald-400');
+            
+            if (oscillator) {
+                oscillator.type = soundSpecs[currentMode].type;
+            }
+        }
+
+        async function initAudio() {
+            if (isRunning) {
+                // Vypnutí aplikace
+                if (oscillator) oscillator.stop();
+                isRunning = false;
+                document.getElementById('startBtn').innerText = "🔴 Nastartovat zvukový modul";
+                document.getElementById('startBtn').className = "w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-gray-950 font-black py-4 px-6 rounded-2xl transition uppercase text-sm";
+                return;
+            }
+
+            // Žádost o povolení senzorů (speciálně pro iOS)
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceMotionEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        alert('Aplikace potřebuje přístup k akcelerometru pro snímání jízdy.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // Inicializace Web Audio API
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
+            biquadFilter = audioCtx.createBiquadFilter();
+
+            oscillator.type = soundSpecs[currentMode].type;
+            oscillator.frequency.setValueAtTime(soundSpecs[currentMode].baseFreq, audioCtx.currentTime);
+            
+            biquadFilter.type = 'lowpass';
+            biquadFilter.frequency.setValueAtTime(soundSpecs[currentMode].filterFreq, audioCtx.currentTime);
+
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Bezpečná hlasitost
+
+            // Propojení audio řetězce
+            oscillator.connect(biquadFilter);
+            biquadFilter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            isRunning = true;
+
+            document.getElementById('startBtn').innerText = "⏹️ Vypnout modul";
+            document.getElementById('startBtn').className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-4 px-6 rounded-2xl transition uppercase text-sm";
+
+            // Spuštění naslouchání akcelerometru
+            window.addEventListener('devicemotion', handleMotion, true);
+        }
+
+        function handleMotion(event) {
+            if (!isRunning) return;
+
+            // Získání zrychlení na ose Z a Y (podle toho, jak telefon v držáku stojí)
+            let accX = event.accelerationIncludingGravity.x || 0;
+            let accY = event.accelerationIncludingGravity.y || 0;
+            let accZ = event.accelerationIncludingGravity.z || 0;
+
+            // Výpočet celkového vektoru zrychlení (očištěného o klidový stav)
+            let totalAcceleration = Math.sqrt(accX*accX + accY*accY + accZ*accZ) - 9.81;
+            if (totalAcceleration < 0) totalAcceleration = 0;
+
+            // Převedení na G-Force (přibližné)
+            let gForce = totalAcceleration / 9.81;
+            if (gForce > 1.5) gForce = 1.5; // Ochranný limit pro běžné zrychlení
+
+            // Aktualizace UI
+            document.getElementById('gForceVal').innerText = gForce.toFixed(2) + " G";
+            document.getElementById('accelBar').style.width = (gForce * 100 / 1.5) + "%";
+
+            // Dynamická úprava zvuku na základě G-Force
+            if (audioCtx && oscillator) {
+                let specs = soundSpecs[currentMode];
+                // Výpočet nové frekvence tónu podle zrychlení
+                let targetFreq = specs.baseFreq + (gForce * (specs.maxFreq - specs.baseFreq));
+                
+                // Hladký přechod zvuku (linearRamp), aby to netrhalo uši
+                oscillator.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
+                
+                // Mírné zesílení zvuku při akceleraci pro agresivnější dojem
+                let targetGain = 0.12 + (gForce * 0.15);
+                gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.05);
+            }
+        }
+    </script>
+</body>
+</html>
