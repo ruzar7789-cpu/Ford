@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aether Grid Intelligence v5.0 — Global System</title>
+    <title>Aether Grid Intelligence v5.0 — Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #030712; color: #d1d5db; font-family: monospace; }
@@ -13,10 +13,10 @@
         .glow-matrix { animation: matrixGlow 2s infinite ease-in-out; }
         @keyframes matrixGlow { 0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); } 50% { border-color: rgba(147, 51, 234, 0.6); box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); } }
         
-        /* Celoobrazovkový vizuální simulátor konceptu */
+        /* Celoobrazovkový vizuální overlay pro koncept */
         #systemViewer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #050b14; z-index: 30; display: none; flex-direction: column; padding: 15px;
+            background-color: #050b14; z-index: 50; display: none; flex-direction: column; padding: 15px;
         }
     </style>
 </head>
@@ -62,8 +62,8 @@
                 <span class="text-indigo-400 font-bold" id="hvdcFlow">73.1 GW</span>
             </div>
             <div>
-                <button onclick="toggleSystemViewer(true)" class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded px-1 py-1 text-[8px] uppercase font-bold tracking-widest animate-pulse">
-                    🗺️ VIZUÁLNÍ KONCEPT SÍTĚ
+                <button onclick="toggleSystemViewer(true)" class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded px-1 py-2 text-[8px] uppercase font-bold tracking-widest animate-pulse pointer-events-auto">
+                    🗺️ VIZUÁLNÍ KONCEPT SÍTÊ
                 </button>
             </div>
         </div>
@@ -81,20 +81,20 @@
     <div id="systemViewer">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
             <div>
-                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid Intelligence — Živá Simulace</h2>
-                <span class="text-[8px] text-gray-500">GRAFICKÝ MAPOVÝ MODEL OD VRTU A FÚZE AŽ PO ELEKTRÁRNU</span>
+                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid — Živá Simulace</h2>
+                <span class="text-[8px] text-gray-500">KLIKNI NA SEKTOR PRO DETAILNÍ INSPEKCI</span>
             </div>
-            <button onclick="toggleSystemViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs">
-                ZAVŘÍT X
+            <button onclick="toggleSystemViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs font-bold">
+                ZAVŘÍT ✕
             </button>
         </div>
 
-        <div class="flex-grow my-2 relative bg-black rounded-xl border border-gray-900 overflow-hidden">
-            <canvas id="conceptCanvas" class="w-full h-full"></canvas>
+        <div class="flex-grow my-2 relative bg-black rounded-xl border border-gray-900 overflow-hidden min-h-[250px]">
+            <canvas id="conceptCanvas"></canvas>
         </div>
 
-        <div class="bg-gray-950 border border-emerald-500/20 p-2 rounded-xl text-[10px] text-gray-400 font-mono" id="conceptDescription">
-            "Klepnutím na obrazovku výše prozkoumáš jednotlivé části animované elektrárenské infrastruktury."
+        <div class="bg-gray-950 border border-emerald-500/20 p-3 rounded-xl text-[10px] text-gray-300 font-mono text-center min-h-[60px]" id="conceptDescription">
+            "Klepnutím na obrazovku výše prozkoumáš součásti elektrárenské infrastruktury (Fúze, Geotermál, Město)."
         </div>
     </div>
 
@@ -116,21 +116,27 @@
         let tick = 0;
 
         window.addEventListener('load', () => {
-            setTimeout(toggleCloudBridge, 500);
             startTelemetrySimulation();
+            // Spustíme vykreslovací smyčku hned na pozadí
             setupConceptCanvas();
             animateConceptLoop();
         });
 
+        // Oprava resize chování canvasu, aby se správně přizpůsobil oknu mobilu
         function toggleSystemViewer(show) {
             document.getElementById('systemViewer').style.display = show ? 'flex' : 'none';
-            if(show) setupConceptCanvas();
+            if(show) {
+                setTimeout(setupConceptCanvas, 50);
+            }
         }
 
         function setupConceptCanvas() {
-            cCanvas.width = cCanvas.parentElement.clientWidth;
-            cCanvas.height = cCanvas.parentElement.clientHeight;
+            const container = cCanvas.parentElement;
+            cCanvas.width = container.clientWidth;
+            cCanvas.height = container.clientHeight;
         }
+
+        window.addEventListener('resize', setupConceptCanvas);
 
         // Živá grafická animace celého konceptu od základu země po fúzi a elektrárnu
         function animateConceptLoop() {
@@ -140,139 +146,139 @@
             tick++;
             const w = cCanvas.width;
             const h = cCanvas.height;
+            
+            if(w === 0 || h === 0) return;
+            
             cCtx.clearRect(0, 0, w, h);
 
-            // 1. KRESLENÍ ZÁKLADU: VRSTVY ZEMĚ (Spodní část - Geotermál)
-            const groundY = h * 0.65;
+            // 1. VRSTVY ZEMĚ (Spodní část - Geotermál)
+            const groundY = h * 0.60;
             cCtx.fillStyle = '#0c0705';
             cCtx.fillRect(0, groundY, w, h - groundY);
 
-            // Pulzující jádro země úplně dole
-            let magmaGlow = cCtx.createLinearGradient(0, h - 50, 0, h);
+            // Žhnoucí magma úplně dole
+            let magmaGlow = cCtx.createLinearGradient(0, h - 40, 0, h);
             magmaGlow.addColorStop(0, '#1e0b02');
             magmaGlow.addColorStop(1, '#ff4500');
             cCtx.fillStyle = magmaGlow;
-            cCtx.fillRect(0, h - 50, w, 50);
+            cCtx.fillRect(0, h - 40, w, 40);
 
-            // Hlubinný vrt (EGS Elektrárna)
+            // Vertikální hlubinný vrt (EGS)
             cCtx.strokeStyle = '#f59e0b';
             cCtx.lineWidth = 3;
             cCtx.beginPath();
-            cCtx.moveTo(w * 0.25, groundY - 20);
-            cCtx.lineTo(w * 0.25, h - 30);
+            cCtx.moveTo(w * 0.25, groundY - 15);
+            cCtx.lineTo(w * 0.25, h - 25);
             cCtx.stroke();
 
-            // Animovaný tok tepla z hlubinného vrtu nahoru do turbín
+            // Energie stoupající z vrtu
             cCtx.fillStyle = '#ff7f50';
-            let particleY = (h - 30) - ((tick * 2) % (h - 30 - (groundY - 20)));
+            let particleY = (h - 25) - ((tick * 2) % (h - 25 - (groundY - 15)));
             cCtx.beginPath();
             cCtx.arc(w * 0.25, particleY, 4, 0, Math.PI * 2);
             cCtx.fill();
 
-            // Budova Geotermální elektrárny na povrchu
+            // Budova Geotermálu
             cCtx.fillStyle = '#1f2937';
-            cCtx.fillRect(w * 0.18, groundY - 40, 70, 40);
+            cCtx.fillRect(w * 0.15, groundY - 35, 70, 35);
             cCtx.fillStyle = '#f59e0b';
-            cCtx.font = '8px monospace';
-            cCtx.fillText("EGS CORE", w * 0.19, groundY - 25);
+            cCtx.font = '9px monospace';
+            cCtx.fillText("EGS SYSTEM", w * 0.17, groundY - 20);
 
-            // 2. KRESLENÍ: FÚZNÍ KOMPLEX (IMF - Levá/Horní část nad vodou)
-            // Mořská hladina na pravé straně
+            // 2. FÚZNÍ REAKTOR (IMF)
             cCtx.fillStyle = '#041122';
-            cCtx.fillRect(w * 0.5, groundY - 15, w * 0.5, 15);
+            cCtx.fillRect(w * 0.55, groundY - 15, w * 0.45, 15); // Mořská hladina
             
-            // Fúzní reaktor (Prstenec plazmatu)
-            const fx = w * 0.7;
-            const fy = groundY - 90;
+            const fx = w * 0.75;
+            const fy = groundY - 80;
+            
             cCtx.strokeStyle = '#9333ea';
             cCtx.lineWidth = 4;
             cCtx.beginPath();
-            cCtx.arc(fx, fy, 25, 0, Math.PI * 2);
+            cCtx.arc(fx, fy, 22, 0, Math.PI * 2);
             cCtx.stroke();
 
-            // Pulzující plazmatické jádro uvnitř reaktoru
+            // Pulzující jádro plazmatu
             cCtx.fillStyle = `rgba(6, 182, 212, ${0.4 + Math.sin(tick*0.1)*0.3})`;
             cCtx.beginPath();
-            cCtx.arc(fx, fy, 15, 0, Math.PI * 2);
+            cCtx.arc(fx, fy, 13, 0, Math.PI * 2);
             cCtx.fill();
             cCtx.fillStyle = '#a855f7';
-            cCtx.fillText("IMF FUSION", fx - 28, fy - 35);
+            cCtx.fillText("IMF FUSION", fx - 25, fy - 30);
 
-            // Nasávání deuteria z moře do fúze
+            // Trubka nasávání z moře
             cCtx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
-            cCtx.lineWidth = 1.5;
+            cCtx.lineWidth = 2;
             cCtx.beginPath();
-            cCtx.moveTo(w * 0.8, groundY - 10);
-            cCtx.lineTo(w * 0.8, fy);
-            cCtx.lineTo(fx + 25, fy);
+            cCtx.moveTo(w * 0.85, groundY - 10);
+            cCtx.lineTo(w * 0.85, fy);
+            cCtx.lineTo(fx + 22, fy);
             cCtx.stroke();
 
-            // 3. KRESLENÍ SÍTĚ: HVDC DRÁTY A VODÍKOVÝ MANAGEMENT (Střed)
+            // 3. CENTRÁLNÍ CHYTRÁ SÍŤ (IoE)
             const cx = w * 0.5;
-            const cy = groundY - 60;
+            const cy = groundY - 50;
             cCtx.fillStyle = '#111827';
-            cCtx.fillRect(cx - 30, cy - 20, 60, 35);
+            cCtx.fillRect(cx - 35, cy - 15, 70, 30);
             cCtx.strokeStyle = '#3b82f6';
-            cCtx.lineWidth = 1;
-            cCtx.strokeRect(cx - 30, cy - 20, 60, 35);
+            cCtx.strokeRect(cx - 35, cy - 15, 70, 30);
             cCtx.fillStyle = '#3b82f6';
-            cCtx.fillText("IoE GRID", cx - 24, cy - 4);
+            cCtx.fillText("IoE GRID", cx - 22, cy + 4);
 
-            // Propojení zdrojů do centrální sítě IoE
-            cCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+            // Propojovací linky
+            cCtx.strokeStyle = 'rgba(255,255,255,0.15)';
             cCtx.beginPath();
-            cCtx.moveTo(w * 0.25, groundY - 40); cCtx.lineTo(cx - 30, cy);
-            cCtx.moveTo(fx - 25, fy); cCtx.lineTo(cx + 30, cy);
+            cCtx.moveTo(w * 0.25, groundY - 35); cCtx.lineTo(cx - 35, cy);
+            cCtx.moveTo(fx - 22, fy); cCtx.lineTo(cx + 35, cy);
             cCtx.stroke();
 
-            // 4. KRESLENÍ SPOTŘEBY: KONEČNÉ MĚSTO A INTEGRACE AI (Vlevo nahoře)
+            // 4. MĚSTO (Spotřeba)
             cCtx.fillStyle = '#0f172a';
-            cCtx.fillRect(20, 40, 80, 70);
+            cCtx.fillRect(15, 35, 80, 65);
             cCtx.strokeStyle = '#06b6d4';
-            cCtx.strokeRect(20, 40, 80, 70);
+            cCtx.strokeRect(15, 35, 80, 65);
             
-            // Okna mrakodrapů
             cCtx.fillStyle = '#334155';
-            for(let mx = 30; mx < 90; mx += 15) {
-                for(let my = 50; my < 100; my += 15) {
-                    cCtx.fillRect(mx, my, 8, 8);
+            for(let mx = 25; mx < 85; mx += 15) {
+                for(let my = 45; my < 90; my += 15) {
+                    cCtx.fillRect(mx, my, 6, 6);
                 }
             }
             cCtx.fillStyle = '#06b6d4';
-            cCtx.fillText("AI MEGACITY", 25, 33);
+            cCtx.fillText("AI MEGACITY", 20, 25);
 
-            // Přenos energie z centrálního IoE uzlu rovnou do města
+            // Distribuce do města
             cCtx.strokeStyle = '#06b6d4';
             cCtx.lineWidth = 2;
             cCtx.beginPath();
-            cCtx.moveTo(cx - 30, cy - 10);
-            cCtx.lineTo(60, cy - 10);
-            cCtx.lineTo(60, 110);
+            cCtx.moveTo(cx - 35, cy);
+            cCtx.lineTo(55, cy);
+            cCtx.lineTo(55, 100);
             cCtx.stroke();
 
-            // Animované toky elektronů proudící po drátech do mrakodrapů měst
+            // Animovaný tok energie
             cCtx.fillStyle = '#00ffcc';
-            let energyX = (cx - 30) - ((tick * 1.5) % (cx - 30 - 60));
+            let energyX = (cx - 35) - ((tick * 1.5) % (cx - 35 - 55));
             cCtx.beginPath();
-            cCtx.arc(energyX, cy - 10, 3, 0, Math.PI * 2);
+            cCtx.arc(energyX, cy, 3, 0, Math.PI * 2);
             cCtx.fill();
         }
 
-        // Změna popisků na základě souřadnic kliknutí pro interaktivní mapu
+        // Interaktivní detekce kliknutí na různé zóny diagramu
         cCanvas.addEventListener('click', (e) => {
             const rect = cCanvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
             const desc = document.getElementById('conceptDescription');
 
-            if (clickY > cCanvas.height * 0.65) {
-                desc.innerHTML = "<span class='text-amber-400'>[ZÁKLAD ZEMĚ & GEOTERMÁL]:</span> Detekovány hluboké tektonické vrstvy zemské kůry v hloubce 7 km. Přehřáté skalní masivy ohřívají vodu na 350°C, která pod tlakem stoupá do turbín EGS elektrárny a stabilizuje celou planetární rozvodnou síť 24 hodin denně.";
+            if (clickY > cCanvas.height * 0.60) {
+                desc.innerHTML = "<span class='text-amber-400 font-bold'>[ZÁKLAD ZEMĚ & GEOTERMÁL]:</span> Hlubinný vrt EGS sahá 7 km pod povrch. Čerpá permanentní teplo zemského jádra, mění vodu na vysokotlakou páru o teplotě 350°C a zajišťuje 100% stabilní základní výkon sítě 24/7.";
             } else if (clickX > cCanvas.width * 0.55) {
-                desc.innerHTML = "<span class='text-purple-400'>[IMF JADERNÁ FÚZE]:</span> Pulzní magnetický prstenec elektrárny. Nasává deuterium extrahované přímo z oceánu na pravé straně. Laserové zapálení vytváří čisté plazmatické výboje s okamžitým výkonem přes 90 GW bez radioaktivního odpadu.";
+                desc.innerHTML = "<span class='text-purple-400 font-bold'>[IMF JADERNÁ FÚZE]:</span> Inerciální fúzní komplex. Separuje deuterium z mořské vody, které v magnetickém prstenci pod laserovými zážehy vytváří čisté plazmatické výboje o výkonu 94.2 GW bez radioaktivního odpadu.";
             } else if (clickX < cCanvas.width * 0.35) {
-                desc.innerHTML = "<span class='text-cyan-400'>[AI INFRASTRUKTURA & MĚSTO]:</span> Konečné spotřební centrum. Zde jsou superpočítačová jádra integrovaná přímo u zdrojů. AI v nanosekundách balancuje napětí, přesměrovává přebytky elektřiny do vodíkových zásobníků a bez ztrát zásobuje celá autonomní města.";
+                desc.innerHTML = "<span class='text-cyan-400 font-bold'>[SPOTŘEBA & AI JÁDRO]:</span> Autonomní Megacity. AI superpočítače vyhodnocují v reálném čase spotřebu uzlů, napájejí infrastrukturu a přebytky bleskově ukládají do vodíkových zásobníků.";
             } else {
-                desc.innerHTML = "<span class='text-blue-400'>[CENTRÁLNÍ RIADENIE IoE]:</span> Internet of Energy (IoE) most. Sběrnice, která chytře rozděluje výkon mezi dálkovou stejnosměrnou síť HVDC a vysokoteplotní elektrolyzéry na akumulaci zeleného vodíku.";
+                desc.innerHTML = "<span class='text-blue-400 font-bold'>[CENTRÁLNÍ SPEKTRUM IoE]:</span> Internet of Energy. Hlavní digitální křižovatka, která přerozděluje energii přes dálkové HVDC linky napříč kontinenty s nulovými přenosovými ztrátami.";
             }
         });
 
@@ -281,133 +287,43 @@
                 closeCloudBridge();
                 return;
             }
-
             try {
                 streamRef = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: { echoCancellation: true, noiseSuppression: true }
+                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
                 });
                 video.srcObject = streamRef;
                 video.play();
-
-                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                    await DeviceMotionEvent.requestPermission();
-                }
-                window.addEventListener('devicemotion', handleMotion);
-
                 isStreaming = true;
                 document.getElementById('netStatus').innerText = "ONLINE / SYNC ACTIVE";
                 document.getElementById('netStatus').className = "text-[9px] text-emerald-400 font-mono tracking-widest mt-0.5";
-                document.getElementById('streamBtn').innerText = "⏹️ ODPOJIT OD GLOBÁLNÍ SÍTĚ";
-                document.getElementById('streamBtn').className = "w-full bg-gray-900 border border-gray-800 text-cyan-400 font-bold py-4 rounded-xl text-xs uppercase";
-                
-                resizeCanvas();
-                renderARLoop();
-                startOnlineStreamingSloop();
-
+                document.getElementById('streamBtn').innerText = "⏹️ ODPOJIT OD SÍTĚ";
             } catch (err) {
                 console.error(err);
-                alert("Povol přístup ke kameře pro vizuální analýzu uzlu!");
+                document.getElementById('aiStatusText').innerText = '"Chyba inicializace kamery. Spouštím nouzový lokální režim..."';
             }
-        }
-
-        function startOnlineStreamingSloop() {
-            streamInterval = setInterval(() => {
-                if (!isStreaming) return;
-
-                const hiddenCanvas = document.getElementById('hiddenCanvas');
-                hiddenCanvas.width = 480; 
-                hiddenCanvas.height = 360;
-                hiddenCanvas.getContext('2d').drawImage(video, 0, 0, 480, 360);
-                
-                const base64Frame = hiddenCanvas.toDataURL('image/jpeg', 0.6);
-
-                fetch('/api/stream', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ image: base64Frame, gForce: lastG })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.response) {
-                        document.getElementById('aiStatusText').innerText = `"${data.response}"`;
-                        
-                        speechSynthesis.cancel();
-                        let utterance = new SpeechSynthesisUtterance(data.response);
-                        utterance.lang = 'cs-CZ';
-                        speechSynthesis.speak(utterance);
-                    }
-                })
-                .catch(err => console.error("Chyba přenosu na cloud:", err));
-
-            }, 5000);
-        }
-
-        function startTelemetrySimulation() {
-            setInterval(() => {
-                if (!isStreaming) return;
-                
-                const fusion = (90 + Math.random() * 8).toFixed(1);
-                const geo = (41 + Math.random() * 2).toFixed(1);
-                const demand = (60 + Math.random() * 5).toFixed(1);
-                const hvdc = (70 + Math.random() * 4).toFixed(1);
-
-                document.getElementById('fusionOutput').innerText = `${fusion} GW`;
-                document.getElementById('geoOutput').innerText = `${geo} GW`;
-                document.getElementById('localDemand').innerText = `${demand}%`;
-                document.getElementById('hvdcFlow').innerText = `${hvdc} GW`;
-
-                const h2Box = document.getElementById('h2Status');
-                if (Math.random() > 0.5) {
-                    h2Box.className = "bg-blue-500/20 text-blue-400 text-[9px] px-2 py-0.5 rounded-full border border-blue-500/30";
-                    h2Box.innerText = "H₂ ELEKTROLÝZA";
-                } else {
-                    h2Box.className = "bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full border border-emerald-500/30";
-                    h2Box.innerText = "SÍŤ STABILNÍ";
-                }
-            }, 2000);
-        }
-
-        function handleMotion(e) {
-            const acc = e.accelerationIncludingGravity;
-            if (acc) {
-                lastG = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z) / 9.81;
-                document.getElementById('gForceDisplay').innerText = `${lastG.toFixed(2)} G`;
-            }
-        }
-
-        function renderARLoop() {
-            if (!isStreaming) return;
-            animationId = requestAnimationFrame(renderARLoop);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, 60, 0, 2 * Math.PI);
-            ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            ctx.fillStyle = 'rgba(6, 182, 212, 0.7)';
-            ctx.font = '8px monospace';
-            ctx.fillText("SYS_REF: AETHER_GLOBAL_GRID", 20, canvas.height - 120);
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
         }
 
         function closeCloudBridge() {
             isStreaming = false;
-            clearInterval(streamInterval);
-            cancelAnimationFrame(animationId);
-            window.removeEventListener('devicemotion', handleMotion);
             if (streamRef) streamRef.getTracks().forEach(t => t.stop());
             video.srcObject = null;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('streamBtn').innerText = "🌀 RESETOVAT / SYNC ON-LINE MOST";
+            document.getElementById('netStatus').innerText = "OFFLINE / DISCONNECTED";
+            document.getElementById('netStatus').className = "text-[9px] text-rose-500 font-mono tracking-widest mt-0.5";
+        }
 
-            document.getElementById('streamBtn').innerText = "🌀 ROZSVÍTIT ON-LINE MOST";
-            document.getElementById('streamBtn').className = "w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-b
+        function startTelemetrySimulation() {
+            setInterval(() => {
+                const fusion = (92 + Math.random() * 4).toFixed(1);
+                const geo = (41 + Math.random() * 1).toFixed(1);
+                const demand = (60 + Math.random() * 4).toFixed(1);
+                const hvdc = (72 + Math.random() * 2).toFixed(1);
+                document.getElementById('fusionOutput').innerText = `${fusion} GW`;
+                document.getElementById('geoOutput').innerText = `${geo} GW`;
+                document.getElementById('localDemand').innerText = `${demand}%`;
+                document.getElementById('hvdcFlow').innerText = `${hvdc} GW`;
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
