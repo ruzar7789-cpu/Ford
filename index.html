@@ -3,169 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus 2.0 Sci-Fi Soundscape</title>
+    <title>Aether Grid Intelligence v5.0 — Control Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .neon-glow {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #030712; color: #d1d5db; font-family: monospace; }
+        #arCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        #bgVideo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.4; }
+        .ui-overlay { position: absolute; z-index: 20; }
+        .glow-matrix { animation: matrixGlow 2s infinite ease-in-out; }
+        @keyframes matrixGlow { 0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); } 50% { border-color: rgba(147, 51, 234, 0.6); box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); } }
+        
+        /* 3D Vizualizační vrstva */
+        #hardwareViewer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #0b1528 0%, #030712 100%);
+            z-index: 30; display: none; flex-direction: column; justify-content: space-between; padding: 20px;
         }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center p-4 font-sans">
+<body>
 
-    <div class="bg-gray-900 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-gray-800 text-center neon-glow">
-        <h1 class="text-2xl font-black text-emerald-400 mb-1 tracking-wider uppercase">⚡ Focus 2.0 Vibe Engine</h1>
-        <p class="text-xs text-gray-500 mb-6">Generátor futuristického zvuku podle zrychlení auta</p>
+    <video id="bgVideo" autoplay playsinline muted></video>
+    <canvas id="arCanvas"></canvas>
 
-        <!-- INDIKÁTOR AKCELERACE -->
-        <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 mb-6">
-            <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400 block mb-2">Aktuální přetížení (G-Force)</span>
-            <div class="text-4xl font-black text-mono text-white transition-all duration-75" id="gForceVal">0.00 G</div>
-            
-            <!-- Vizuální lišta zrychlení -->
-            <div class="w-full bg-gray-850 h-3 rounded-full mt-4 overflow-hidden border border-gray-800">
-                <div id="accelBar" class="bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-400 h-full w-0 transition-all duration-75"></div>
-            </div>
+    <div class="ui-overlay top-4 left-4 right-4 grid grid-cols-2 gap-2 md:grid-cols-4 pointer-events-none">
+        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-cyan-500/30">
+            <h1 class="text-[11px] font-black tracking-wider text-cyan-400 uppercase">🌌 AGI-GRID CORE</h1>
+            <p id="netStatus" class="text-[9px] text-emerald-400 font-mono tracking-widest mt-0.5">ONLINE / SYNC ACTIVE</p>
+        </div>
+        
+        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-purple-500/20">
+            <span class="text-[8px] text-purple-400 block tracking-wider uppercase">FÚZNÍ REAKTOR (IMF)</span>
+            <div class="text-xs font-bold text-purple-300 mt-0.5" id="fusionOutput">94.2 GW</div>
         </div>
 
-        <!-- VÝBĚR ZVUKU -->
-        <div class="mb-6 text-left">
-            <label class="block text-xs font-bold uppercase tracking-wider mb-2 text-gray-400">Zvolit režim pohonu</label>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="setSoundMode('hyperdrive')" id="btn-hyperdrive" class="sound-btn p-3 bg-emerald-500 text-gray-950 font-bold rounded-xl text-xs transition border border-emerald-400">
-                    🚀 Hyperdrive (Star Wars)
-                </button>
-                <button onclick="setSoundMode('cyber')" id="btn-cyber" class="sound-btn p-3 bg-gray-800 text-gray-400 font-bold rounded-xl text-xs transition border border-gray-750 hover:bg-gray-750">
-                    🤖 CyberSynth 2077
-                </button>
-            </div>
+        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-amber-500/20">
+            <span class="text-[8px] text-amber-400 block tracking-wider uppercase">GEOTERMÁLNÍ VRTY (EGS)</span>
+            <div class="text-xs font-bold text-amber-300 mt-0.5" id="geoOutput">41.8 GW</div>
         </div>
 
-        <!-- HLAVNÍ OVLÁDACÍ TLAČÍTKO -->
-        <button id="startBtn" onclick="initAudio()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-gray-950 font-black py-4 px-6 rounded-2xl transition duration-200 transform active:scale-[0.97] tracking-wider uppercase text-sm shadow-lg shadow-emerald-500/20">
-            🔴 Nastartovat zvukový modul
-        </button>
-
-        <!-- INFO POZNÁMKA -->
-        <p class="text-[10px] text-gray-500 mt-4">
-            Upozornění: Pro správnou funkci musí být telefon pevně uchycen v držáku auta a rádio propojeno přes AUX/Bluetooth. Na zařízeních iOS (Apple) bude vyžádáno povolení přístupu k pohybovým senzorům.
-        </p>
+        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-blue-500/20 flex justify-between items-center">
+            <div>
+                <span class="text-[8px] text-blue-400 block tracking-wider uppercase">DYNAMICKÉ PŘETÍŽENÍ</span>
+                <div class="text-xs font-bold text-blue-300 mt-0.5" id="gForceDisplay">1.00 G</div>
+            </div>
+            <div class="bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full border border-emerald-500/30" id="h2Status">H₂ AKUMULACE</div>
+        </div>
     </div>
 
-    <script>
-        let audioCtx = null;
-        let oscillator = null;
-        let gainNode = null;
-        let biquadFilter = null;
-        let isRunning = false;
-        let currentMode = 'hyperdrive';
+    <div class="ui-overlay bottom-6 left-4 right-4 flex flex-col gap-3">
         
-        // Nastavení základních zvukových parametrů pro režimy
-        const soundSpecs = {
-            hyperdrive: { baseFreq: 60, maxFreq: 280, type: 'sawtooth', filterFreq: 800 },
-            cyber: { baseFreq: 45, maxFreq: 180, type: 'triangle', filterFreq: 400 }
-        };
+        <div class="bg-gray-950/95 backdrop-blur-md p-3 rounded-xl border border-gray-800 text-[10px] grid grid-cols-3 gap-2 text-center font-mono">
+            <div>
+                <span class="text-gray-500 block uppercase text-[8px]">Lokální Spotřeba</span>
+                <span class="text-cyan-400 font-bold" id="localDemand">62.4%</span>
+            </div>
+            <div>
+                <span class="text-gray-500 block uppercase text-[8px]">HVDC Dálkový Přenos</span>
+                <span class="text-indigo-400 font-bold" id="hvdcFlow">73.1 GW</span>
+            </div>
+            <div>
+                <button onclick="toggleHardwareViewer(true)" class="w-full bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded px-1 py-1 text-[8px] uppercase font-bold tracking-widest animate-pulse">
+                    🔍 3D DETAILED HW
+                </button>
+            </div>
+        </div>
+        
+        <div id="aiResponseBox" class="bg-gray-950/95 backdrop-blur-md p-4 rounded-2xl border border-gray-800 text-center glow-matrix">
+            <span class="text-[9px] uppercase font-bold text-cyan-400 block tracking-widest">KOGNITIVNÍ ARCHITEKTURA NE X U S</span>
+            <div id="aiStatusText" class="text-xs text-gray-300 italic mt-2">"Inicializuji globální energetickou sběrnici... Skenuji uzel."</div>
+        </div>
 
-        function setSoundMode(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.sound-btn').forEach(btn => {
-                btn.classList.remove('bg-emerald-500', 'text-gray-950', 'border-emerald-400');
-                btn.classList.add('bg-gray-800', 'text-gray-400', 'border-gray-750');
-            });
-            const activeBtn = document.getElementById(`btn-${mode}`);
-            activeBtn.classList.remove('bg-gray-800', 'text-gray-400', 'border-gray-750');
-            activeBtn.classList.add('bg-emerald-500', 'text-gray-950', 'border-emerald-400');
+        <button id="streamBtn" onclick="toggleCloudBridge()" class="w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-black py-4 rounded-xl transition duration-300 transform active:scale-[0.98] tracking-wider uppercase text-xs shadow-lg shadow-cyan-500/20">
+            🌀 RESETOVAT / SYNC ON-LINE MOST
+        </button>
+    </div>
+
+    <div id="hardwareViewer">
+        <div class="flex justify-between items-center border-b border-cyan-500/30 pb-3">
+            <div>
+                <h2 class="text-xs font-bold text-cyan-400">AETHER CORE NODE — HARDWARE BLUEPRINT</h2>
+                <span class="text-[9px] text-gray-500">X-RAY INTERACTIVE SCHEMATIC</span>
+            </div>
+            <button onclick="toggleHardwareViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs hover:bg-rose-500/30">
+                ZAVŘÍT ✕
+            </button>
+        </div>
+
+        <div class="flex-grow flex items-center justify-center relative my-4">
+            <canvas id="hardwareCanvas" class="w-full h-64 max-w-sm"></canvas>
             
-            if (oscillator) {
-                oscillator.type = soundSpecs[currentMode].type;
+            <div class="absolute left-0 top-4 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
+                <span class="text-cyan-400 font-bold block">1. TITANOVÉ ŠASI</span>
+                Letecká slitina s EMP stíněním proti záření z fúze.
+            </div>
+            <div class="absolute right-0 top-12 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
+                <span class="text-purple-400 font-bold block">2. OPTICKÉ JÁDRO</span>
+                Termovize, LiDAR a laser pro analýzu uzlů reality.
+            </div>
+            <div class="absolute left-0 bottom-4 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
+                <span class="text-amber-400 font-bold block">3. GRAFENOVÝ ČLÁNEK</span>
+                Bleskové indukční napájení z energetického pole.
+            </div>
+        </div>
+
+        <div class="bg-gray-950/80 border border-gray-800 p-3 rounded-xl grid grid-cols-3 gap-2 text-center text-[9px]">
+            <button onclick="selectPart('Chassis')" class="bg-gray-900 border border-cyan-500/30 py-2 rounded text-cyan-400">TITANOVÝ PLÁŠŤ</button>
+            <button onclick="selectPart('Optics')" class="bg-gray-900 border border-purple-500/30 py-2 rounded text-purple-400">OPTIKA & LiDAR</button>
+            <button onclick="selectPart('Battery')" class="bg-gray-900 border border-amber-500/30 py-2 rounded text-amber-400">GRAFENOVÝ ZDROJ</button>
+        </div>
+        <div class="text-center text-[10px] text-cyan-300 mt-2 italic font-mono" id="partDetails">
+            "Klepnutím na tlačítko výše proveď hloubkový sken dané součásti."
+        </div>
+    </div>
+
+    <canvas id="hiddenCanvas" class="hidden"></canvas>
+
+    <script>
+        let isStreaming = false;
+        let video = document.getElementById('bgVideo');
+        let canvas = document.getElementById('arCanvas');
+        let ctx = canvas.getContext('2d');
+        let streamRef = null;
+        let lastG = 1.0;
+        let animationId = null;
+        let streamInterval = null;
+
+        // 3D Canvas nastavení
+        const hwCanvas = document.getElementById('hardwareCanvas');
+        const hwCtx = hwCanvas.getContext('2d');
+        let angle = 0;
+        let selectedPart = "None";
+
+        window.addEventListener('load', () => {
+            setTimeout(toggleCloudBridge, 500);
+            startTelemetrySimulation();
+            setupHardwareCanvas();
+            animateHardware();
+        });
+
+        // Přepínání vizualizační vrstvy
+        function toggleHardwareViewer(show) {
+            document.getElementById('hardwareViewer').style.display = show ? 'flex' : 'none';
+        }
+
+        function setupHardwareCanvas() {
+            hwCanvas.width = 400;
+            hwCanvas.height = 400;
+        }
+
+        // Vykreslování a animace 3D rotujícího "Aether Core" zařízení na Canvasu
+        function animateHardware() {
+            requestAnimationFrame(animateHardware);
+            hwCtx.clearRect(0, 0, hwCanvas.width, hwCanvas.height);
+            
+            const cx = hwCanvas.width / 2;
+            const cy = hwCanvas.height / 2;
+            angle += 0.015; // Rychlost rotace
+
+            hwCtx.save();
+            hwCtx.translate(cx, cy);
+            
+            // 1. Kreslení laserového paprsku na pozadí (aktivní optika)
+            hwCtx.beginPath();
+            hwCtx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+            hwCtx.lineWidth = 1;
+            for(let i = -100; i < 100; i += 10) {
+                hwCtx.moveTo(i, -120);
+                hwCtx.lineTo(i + Math.sin(angle)*20, 150);
+            }
+            hwCtx.stroke();
+
+            // 2. Rotace těla přístroje (3D efekt pomocí kosinu)
+            const width = 120 * Math.abs(Math.cos(angle));
+            const height = 180;
+
+            // Vnější titanové šasi (Šestiúhelníkový řez)
+            hwCtx.beginPath();
+            hwCtx.rect(-width/2, -height/2, width, height);
+            
+            // Zvýraznění aktivních částí při kliknutí
+            if (selectedPart === 'Chassis') {
+                hwCtx.strokeStyle = '#06b6d4';
+                hwCtx.shadowColor = '#06b6d4';
+                hwCtx.shadowBlur = 15;
+            } else {
+                hwCtx.strokeStyle = 'rgba(74, 85, 104, 0.8)';
+                hwCtx.shadowBlur = 0;
+            }
+            hwCtx.lineWidth = 3;
+            hwCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            hwCtx.fill();
+            hwCtx.stroke();
+
+            // 3. Vnitřní komponenty (X-Ray efekt)
+            // Grafenová baterie (spodní část)
+            hwCtx.beginPath();
+            hwCtx.rect(-width/3, 20, (width*2)/3, 50);
+            hwCtx.fillStyle = selectedPart === 'Battery' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(245, 158, 11, 0.15)';
+            hwCtx.strokeStyle = '#f59e0b';
+            hwCtx.lineWidth = 1;
+            hwCtx.fill();
+            hwCtx.stroke();
+
+            // Kvantové procesorové jádro (střed)
+            hwCtx.beginPath();
+            hwCtx.arc(0, -10, width/4, 0, Math.PI*2);
+            hwCtx.fillStyle = 'rgba(147, 51, 234, 0.2)';
+            hwCtx.strokeStyle = '#9333ea';
+            hwCtx.stroke();
+
+            // 4. Zadní snímací prstenec (Optika) navrchu
+            hwCtx.beginPath();
+            hwCtx.arc(0, -50, 20 * Math.abs(Math.cos(angle)), 0, Math.PI*2);
+            hwCtx.fillStyle = selectedPart === 'Optics' ? 'rgba(6, 182, 212, 0.6)' : 'rgba(6, 182, 212, 0.3)';
+            hwCtx.strokeStyle = '#06b6d4';
+            hwCtx.fill();
+            hwCtx.stroke();
+
+            hwCtx.restore();
+        }
+
+        // Zobrazení detailů po kliknutí na tlačítko komponentu
+        function selectPart(part) {
+            selectedPart = part;
+            const details = document.getElementById('partDetails');
+            if (part === 'Chassis') {
+                details.innerHTML = "<span class='text-cyan-400'>[TITAN CHASSIS]:</span> 100% EMP stíněno. Odolává tlaku až 15 G a extrémnímu žáru z fúzního prstence.";
+            } else if (part === 'Optics') {
+                details.innerHTML = "<span class='text-purple-400'>[QUANTUM OPTICS]:</span> Integrovaná termovize a multispektrální skener mapující strukturu reality pro Gemini.";
+            } else if (part === 'Battery') {
+                details.innerHTML = "<span class='text-amber-400'>[SOLID-STATE BATTERY]:</span> Grafenový článek s okamžitou rezonanční obnovou náboje přes okolní magnetické pole.";
             }
         }
 
-        async function initAudio() {
-            if (isRunning) {
-                // Vypnutí aplikace
-                if (oscillator) oscillator.stop();
-                isRunning = false;
-                document.getElementById('startBtn').innerText = "🔴 Nastartovat zvukový modul";
-                document.getElementById('startBtn').className = "w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-gray-950 font-black py-4 px-6 rounded-2xl transition uppercase text-sm";
+        async function toggleCloudBridge() {
+            if (isStreaming) {
+                closeCloudBridge();
                 return;
             }
 
-            // Žádost o povolení senzorů (speciálně pro iOS)
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                try {
-                    const permission = await DeviceMotionEvent.requestPermission();
-                    if (permission !== 'granted') {
-                        alert('Aplikace potřebuje přístup k akcelerometru pro snímání jízdy.');
-                        return;
-                    }
-                } catch (error) {
-                    console.error(error);
+            try {
+                streamRef = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: { echoCancellation: true, noiseSuppression: true }
+                });
+                video.srcObject = streamRef;
+                video.play();
+
+                if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                    await DeviceMotionEvent.requestPermission();
                 }
+                window.addEventListener('devicemotion', handleMotion);
+
+                isStreaming = true;
+                document.getElementById('netStatus').innerText = "ONLINE / SYNC ACTIVE";
+                document.getElementById('netStatus').className = "text-[9px] text-emerald-400 font-mono tracking-widest mt-0.5";
+                document.getElementById('streamBtn').innerText = "⏹️ ODPOJIT OD GLOBÁLNÍ SÍTĚ";
+                document.getElementById('streamBtn').className = "w-full bg-gray-900 border border-gray-800 text-cyan-400 font-bold py-4 rounded-xl text-xs uppercase";
+                
+                resizeCanvas();
+                renderARLoop();
+                startOnlineStreamingSloop();
+
+            } catch (err) {
+                console.error(err);
+                alert("Povol přístup ke kameře pro vizuální analýzu uzlu!");
             }
-
-            // Inicializace Web Audio API
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            oscillator = audioCtx.createOscillator();
-            gainNode = audioCtx.createGain();
-            biquadFilter = audioCtx.createBiquadFilter();
-
-            oscillator.type = soundSpecs[currentMode].type;
-            oscillator.frequency.setValueAtTime(soundSpecs[currentMode].baseFreq, audioCtx.currentTime);
-            
-            biquadFilter.type = 'lowpass';
-            biquadFilter.frequency.setValueAtTime(soundSpecs[currentMode].filterFreq, audioCtx.currentTime);
-
-            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Bezpečná hlasitost
-
-            // Propojení audio řetězce
-            oscillator.connect(biquadFilter);
-            biquadFilter.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            isRunning = true;
-
-            document.getElementById('startBtn').innerText = "⏹️ Vypnout modul";
-            document.getElementById('startBtn').className = "w-full bg-rose-600 hover:bg-rose-700 text-white font-black py-4 px-6 rounded-2xl transition uppercase text-sm";
-
-            // Spuštění naslouchání akcelerometru
-            window.addEventListener('devicemotion', handleMotion, true);
         }
 
-        function handleMotion(event) {
-            if (!isRunning) return;
+        function startOnlineStreamingSloop() {
+            streamInterval = setInterval(() => {
+                if (!isStreaming) return;
 
-            // Získání zrychlení na ose Z a Y (podle toho, jak telefon v držáku stojí)
-            let accX = event.accelerationIncludingGravity.x || 0;
-            let accY = event.accelerationIncludingGravity.y || 0;
-            let accZ = event.accelerationIncludingGravity.z || 0;
-
-            // Výpočet celkového vektoru zrychlení (očištěného o klidový stav)
-            let totalAcceleration = Math.sqrt(accX*accX + accY*accY + accZ*accZ) - 9.81;
-            if (totalAcceleration < 0) totalAcceleration = 0;
-
-            // Převedení na G-Force (přibližné)
-            let gForce = totalAcceleration / 9.81;
-            if (gForce > 1.5) gForce = 1.5; // Ochranný limit pro běžné zrychlení
-
-            // Aktualizace UI
-            document.getElementById('gForceVal').innerText = gForce.toFixed(2) + " G";
-            document.getElementById('accelBar').style.width = (gForce * 100 / 1.5) + "%";
-
-            // Dynamická úprava zvuku na základě G-Force
-            if (audioCtx && oscillator) {
-                let specs = soundSpecs[currentMode];
-                // Výpočet nové frekvence tónu podle zrychlení
-                let targetFreq = specs.baseFreq + (gForce * (specs.maxFreq - specs.baseFreq));
+                const hiddenCanvas = document.getElementById('hiddenCanvas');
+                hiddenCanvas.width = 480; 
+                hiddenCanvas.height = 360;
+                hiddenCanvas.getContext('2d').drawImage(video, 0, 0, 480, 360);
                 
-                // Hladký přechod zvuku (linearRamp), aby to netrhalo uši
-                oscillator.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
+                const base64Frame = hiddenCanvas.toDataURL('image/jpeg', 0.6);
+
+                fetch('/api/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: base64Frame, gForce: lastG })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.response) {
+                        document.getElementById('aiStatusText').innerText = `"${data.response}"`;
+                        
+                        speechSynthesis.cancel();
+                        let utterance = new SpeechSynthesisUtterance(data.response);
+                        utterance.lang = 'cs-CZ';
+                        speechSynthesis.speak(utterance);
+                    }
+                })
+                .catch(err => console.error("Chyba přenosu na cloud:", err));
+
+            }, 5000);
+        }
+
+        function startTelemetrySimulation() {
+            setInterval(() => {
+                if (!isStreaming) return;
                 
-                // Mírné zesílení zvuku při akceleraci pro agresivnější dojem
-                let targetGain = 0.12 + (gForce * 0.15);
-                gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.05);
+                const fusion = (90 + Math.random() * 8).toFixed(1);
+                const geo = (41 + Math.random() * 2).toFixed(1);
+                const demand = (60 + Math.random() * 5).toFixed(1);
+                const hvdc = (70 + Math.random() * 4).toFixed(1);
+
+                document.getElementById('fusionOutput').innerText = `${fusion} GW`;
+                document.getElementById('geoOutput').innerText = `${geo} GW`;
+                document.getElementById('localDemand').innerText = `${demand}%`;
+                document.getElementById('hvdcFlow').innerText = `${hvdc} GW`;
+
+                const h2Box = document.getElementById('h2Status');
+                if (Math.random() > 0.5) {
+                    h2Box.className = "bg-blue-500/20 text-blue-400 text-[9px] px-2 py-0.5 rounded-full border border-blue-500/30";
+                    h2Box.innerText = "H₂ ELEKTROLÝZA";
+                } else {
+                    h2Box.className = "bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full border border-emerald-500/30";
+                    h2Box.innerText = "SÍŤ STABILNÍ";
+                }
+            }, 2000);
+        }
+
+        function handleMotion(e) {
+            const acc = e.accelerationIncludingGravity;
+            if (acc) {
+                lastG = Math.sqrt(acc.x*acc.x + acc.y*acc.y + acc.z*acc.z) / 9.81;
+                document.getElementById('gForceDisplay').innerText = `${lastG.toFixed(2)} G`;
             }
+        }
+
+        function renderARLoop() {
+            if (!isStreaming) return;
+            animationId = requestAnimationFrame(renderARLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, 60, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(147, 51, 234, 0.3)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(cx - 90, cy); ctx.lineTo(cx - 30, cy);
+            ctx.moveTo(cx + 30, cy); ctx.lineTo(cx + 90, cy);
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)';
+            ctx.stroke();
+            
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.7)';
+            ctx.font = '8px monospace';
+            ctx.fillText("SYS_REF: AETHER_GRID_INTELLIGENCE", 20, canvas.height - 120);
+            ctx.fillText(`NODE_LATENCY: ${(15 + Math.random()*20).toFixed(0)}ms`, 20, canvas.height - 105);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function closeCloudBridge() {
+            isStreaming = false;
+            clearInterval(streamInterval);
+            cancelAnimationFrame(animationId);
+            window.removeEventListener('devicemotion', handleMotion);
+            if (streamRef) streamRef.getTracks().forEach(t => t.stop());
+            video.srcObject = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            document.getElementById('streamBtn').innerText = "🌀 ROZSVÍTIT ON-LINE MOST";
+            document.getElementById('streamBtn').className = "w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase";
+            document.getElementById('netStatus').innerText = "OFFLINE / DISCONNECTED";
+            document.getElementById('netStatus').className = "text-[9px] text-rose-500 font-mono tracking-widest mt-0.5";
+            document.getElementById('aiStatusText').innerText = '"Most uzavřen. Globální uzel odpojen..."';
         }
     </script>
 </body>
