@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aether Grid Intelligence v5.0 — Control Center</title>
+    <title>Aether Grid Intelligence v5.0 — Global System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #030712; color: #d1d5db; font-family: monospace; }
@@ -13,11 +13,12 @@
         .glow-matrix { animation: matrixGlow 2s infinite ease-in-out; }
         @keyframes matrixGlow { 0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); } 50% { border-color: rgba(147, 51, 234, 0.6); box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); } }
         
-        /* 3D Vizualizační vrstva */
-        #hardwareViewer {
+        /* Globální vizualizační vrstva infrastruktury */
+        #systemViewer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #0b1528 0%, #030712 100%);
-            z-index: 30; display: none; flex-direction: column; justify-content: space-between; padding: 20px;
+            background: linear-gradient(180deg, #070b14 0%, #030712 100%);
+            z-index: 30; display: none; flex-direction: column; justify-content: space-between; padding: 15px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -63,8 +64,8 @@
                 <span class="text-indigo-400 font-bold" id="hvdcFlow">73.1 GW</span>
             </div>
             <div>
-                <button onclick="toggleHardwareViewer(true)" class="w-full bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 rounded px-1 py-1 text-[8px] uppercase font-bold tracking-widest animate-pulse">
-                    🔍 3D DETAILED HW
+                <button onclick="toggleSystemViewer(true)" class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded px-1 py-1 text-[8px] uppercase font-bold tracking-widest animate-pulse">
+                    🗺️ ZOBRAZIT CELÝ KONCEPT
                 </button>
             </div>
         </div>
@@ -79,41 +80,70 @@
         </button>
     </div>
 
-    <div id="hardwareViewer">
-        <div class="flex justify-between items-center border-b border-cyan-500/30 pb-3">
+    <div id="systemViewer">
+        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
             <div>
-                <h2 class="text-xs font-bold text-cyan-400">AETHER CORE NODE — HARDWARE BLUEPRINT</h2>
-                <span class="text-[9px] text-gray-500">X-RAY INTERACTIVE SCHEMATIC</span>
+                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid Intelligence — Kompletní Ekosystém</h2>
+                <span class="text-[8px] text-gray-500">SCHÉMA INFRASTRUKTURY OD ZÁKLADU PO ELEKTRÁRNU</span>
             </div>
-            <button onclick="toggleHardwareViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs hover:bg-rose-500/30">
-                ZAVŘÍT ✕
+            <button onclick="toggleSystemViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs">
+                ZAVŘÍT X
             </button>
         </div>
 
-        <div class="flex-grow flex items-center justify-center relative my-4">
-            <canvas id="hardwareCanvas" class="w-full h-64 max-w-sm"></canvas>
+        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 my-3">
             
-            <div class="absolute left-0 top-4 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
-                <span class="text-cyan-400 font-bold block">1. TITANOVÉ ŠASI</span>
-                Letecká slitina s EMP stíněním proti záření z fúze.
+            <div class="bg-gray-950/80 p-3 rounded-xl border border-purple-500/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-purple-400 block">⚡ PILÍŘ 1: DECENTRALIZOVANÁ FÚZE (IMF)</span>
+                    <p class="text-[9px] text-gray-400 mt-1">
+                        <strong>Základ:</strong> Mořská voda s vysokým obsahem deuterické složky.<br>
+                        <strong>Elektrárna:</strong> Inerciálně-magnetizovaný pulzní fúzní reaktor, který přeměňuje energii plazmatu přímo na gigawatty čistého proudu bez radioaktivního odpadu.
+                    </p>
+                </div>
+                <button onclick="inspectZone('Fusion')" class="mt-2 w-full bg-purple-950/50 border border-purple-500/40 rounded py-1 text-[8px] text-purple-300 font-bold uppercase tracking-wider">Prověřit Fúzní Komplex</button>
             </div>
-            <div class="absolute right-0 top-12 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
-                <span class="text-purple-400 font-bold block">2. OPTICKÉ JÁDRO</span>
-                Termovize, LiDAR a laser pro analýzu uzlů reality.
+
+            <div class="bg-gray-950/80 p-3 rounded-xl border border-amber-500/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-amber-400 block">🌋 PILÍŘ 2: HLUBINNÁ GEOTERMÁLNÍ ENERGIE (EGS)</span>
+                    <p class="text-[9px] text-gray-400 mt-1">
+                        <strong>Základ:</strong> Teplo zemského jádra přístupné přes vertikální hlubinné vrty.<br>
+                        <strong>Elektrárna:</strong> Uzavřený hydrotermální okruh s přehřátou kapalinou pohánějící vysokotlaké turbíny. Zajišťuje stoprocentně stabilní základní linii 24/7.
+                    </p>
+                </div>
+                <button onclick="inspectZone('Geo')" class="mt-2 w-full bg-amber-950/50 border border-amber-500/40 rounded py-1 text-[8px] text-amber-300 font-bold uppercase tracking-wider">Prověřit Geotermální Vrty</button>
             </div>
-            <div class="absolute left-0 bottom-4 bg-gray-950/80 border border-gray-800 p-2 rounded text-[8px] max-w-[120px] font-mono">
-                <span class="text-amber-400 font-bold block">3. GRAFENOVÝ ČLÁNEK</span>
-                Bleskové indukční napájení z energetického pole.
+
+            <div class="bg-gray-950/80 p-3 rounded-xl border border-blue-500/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-blue-400 block">💧 DISTRIBUCE: VODÍK & HVDC SBĚRNICE</span>
+                    <p class="text-[9px] text-gray-400 mt-1">
+                        <strong>Konverze přebytků:</strong> Vysokoteplotní elektrolýza přeměňuje nadbytečnou energii na zelený vodík pro masivní akumulační úložiště.<br>
+                        <strong>Dálkový transport:</strong> Vysokonapěťová stejnosměrná síť (HVDC) přelévá energii napříč kontinenty s nulovými ztrátami.
+                    </p>
+                </div>
+                <button onclick="inspectZone('Distribution')" class="mt-2 w-full bg-blue-950/50 border border-blue-500/40 rounded py-1 text-[8px] text-blue-300 font-bold uppercase tracking-wider">Prověřit Distribuci sítě</button>
             </div>
+
+            <div class="bg-gray-950/80 p-3 rounded-xl border border-cyan-500/20 flex flex-col justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-cyan-400 block">🧠 DATA & SPOTŘEBA: AI INTEGRACE</span>
+                    <p class="text-[9px] text-gray-400 mt-1">
+                        <strong>Konečná spotřeba:</strong> Celosvětová síť měst řízená chytrými edge uzly.<br>
+                        <strong>AI Superpočítače:</strong> Datová jádra procesorů jsou fyzicky integrovaná přímo u fúzních elektráren pro přísun čisté energie s nulovou latencí.
+                    </p>
+                </div>
+                <button onclick="inspectZone('AI')" class="mt-2 w-full bg-cyan-950/50 border border-cyan-500/40 rounded py-1 text-[8px] text-cyan-300 font-bold uppercase tracking-wider">Prověřit AI Superpočítač</button>
+            </div>
+
         </div>
 
-        <div class="bg-gray-950/80 border border-gray-800 p-3 rounded-xl grid grid-cols-3 gap-2 text-center text-[9px]">
-            <button onclick="selectPart('Chassis')" class="bg-gray-900 border border-cyan-500/30 py-2 rounded text-cyan-400">TITANOVÝ PLÁŠŤ</button>
-            <button onclick="selectPart('Optics')" class="bg-gray-900 border border-purple-500/30 py-2 rounded text-purple-400">OPTIKA & LiDAR</button>
-            <button onclick="selectPart('Battery')" class="bg-gray-900 border border-amber-500/30 py-2 rounded text-amber-400">GRAFENOVÝ ZDROJ</button>
-        </div>
-        <div class="text-center text-[10px] text-cyan-300 mt-2 italic font-mono" id="partDetails">
-            "Klepnutím na tlačítko výše proveď hloubkový sken dané součásti."
+        <div class="bg-gray-950 border border-emerald-500/30 p-3 rounded-xl text-center">
+            <span class="text-[8px] font-bold text-emerald-400 uppercase tracking-widest block">HLOUBKOVÝ DIGITÁLNÍ INSPEKTOR UZLŮ</span>
+            <div id="zoneInspectionDetails" class="text-[10px] text-gray-300 italic mt-1 font-mono">
+                "Klepnutím na jakýkoliv sektor výše zobrazíš technický popis od základu až po hotový komplex."
+            </div>
         </div>
     </div>
 
@@ -129,111 +159,21 @@
         let animationId = null;
         let streamInterval = null;
 
-        // 3D Canvas nastavení
-        const hwCanvas = document.getElementById('hardwareCanvas');
-        const hwCtx = hwCanvas.getContext('2d');
-        let angle = 0;
-        let selectedPart = "None";
-
-        window.addEventListener('load', () => {
-            setTimeout(toggleCloudBridge, 500);
-            startTelemetrySimulation();
-            setupHardwareCanvas();
-            animateHardware();
-        });
-
-        // Přepínání vizualizační vrstvy
-        function toggleHardwareViewer(show) {
-            document.getElementById('hardwareViewer').style.display = show ? 'flex' : 'none';
+        function toggleSystemViewer(show) {
+            document.getElementById('systemViewer').style.display = show ? 'flex' : 'none';
         }
 
-        function setupHardwareCanvas() {
-            hwCanvas.width = 400;
-            hwCanvas.height = 400;
-        }
-
-        // Vykreslování a animace 3D rotujícího "Aether Core" zařízení na Canvasu
-        function animateHardware() {
-            requestAnimationFrame(animateHardware);
-            hwCtx.clearRect(0, 0, hwCanvas.width, hwCanvas.height);
-            
-            const cx = hwCanvas.width / 2;
-            const cy = hwCanvas.height / 2;
-            angle += 0.015; // Rychlost rotace
-
-            hwCtx.save();
-            hwCtx.translate(cx, cy);
-            
-            // 1. Kreslení laserového paprsku na pozadí (aktivní optika)
-            hwCtx.beginPath();
-            hwCtx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
-            hwCtx.lineWidth = 1;
-            for(let i = -100; i < 100; i += 10) {
-                hwCtx.moveTo(i, -120);
-                hwCtx.lineTo(i + Math.sin(angle)*20, 150);
-            }
-            hwCtx.stroke();
-
-            // 2. Rotace těla přístroje (3D efekt pomocí kosinu)
-            const width = 120 * Math.abs(Math.cos(angle));
-            const height = 180;
-
-            // Vnější titanové šasi (Šestiúhelníkový řez)
-            hwCtx.beginPath();
-            hwCtx.rect(-width/2, -height/2, width, height);
-            
-            // Zvýraznění aktivních částí při kliknutí
-            if (selectedPart === 'Chassis') {
-                hwCtx.strokeStyle = '#06b6d4';
-                hwCtx.shadowColor = '#06b6d4';
-                hwCtx.shadowBlur = 15;
-            } else {
-                hwCtx.strokeStyle = 'rgba(74, 85, 104, 0.8)';
-                hwCtx.shadowBlur = 0;
-            }
-            hwCtx.lineWidth = 3;
-            hwCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-            hwCtx.fill();
-            hwCtx.stroke();
-
-            // 3. Vnitřní komponenty (X-Ray efekt)
-            // Grafenová baterie (spodní část)
-            hwCtx.beginPath();
-            hwCtx.rect(-width/3, 20, (width*2)/3, 50);
-            hwCtx.fillStyle = selectedPart === 'Battery' ? 'rgba(245, 158, 11, 0.4)' : 'rgba(245, 158, 11, 0.15)';
-            hwCtx.strokeStyle = '#f59e0b';
-            hwCtx.lineWidth = 1;
-            hwCtx.fill();
-            hwCtx.stroke();
-
-            // Kvantové procesorové jádro (střed)
-            hwCtx.beginPath();
-            hwCtx.arc(0, -10, width/4, 0, Math.PI*2);
-            hwCtx.fillStyle = 'rgba(147, 51, 234, 0.2)';
-            hwCtx.strokeStyle = '#9333ea';
-            hwCtx.stroke();
-
-            // 4. Zadní snímací prstenec (Optika) navrchu
-            hwCtx.beginPath();
-            hwCtx.arc(0, -50, 20 * Math.abs(Math.cos(angle)), 0, Math.PI*2);
-            hwCtx.fillStyle = selectedPart === 'Optics' ? 'rgba(6, 182, 212, 0.6)' : 'rgba(6, 182, 212, 0.3)';
-            hwCtx.strokeStyle = '#06b6d4';
-            hwCtx.fill();
-            hwCtx.stroke();
-
-            hwCtx.restore();
-        }
-
-        // Zobrazení detailů po kliknutí na tlačítko komponentu
-        function selectPart(part) {
-            selectedPart = part;
-            const details = document.getElementById('partDetails');
-            if (part === 'Chassis') {
-                details.innerHTML = "<span class='text-cyan-400'>[TITAN CHASSIS]:</span> 100% EMP stíněno. Odolává tlaku až 15 G a extrémnímu žáru z fúzního prstence.";
-            } else if (part === 'Optics') {
-                details.innerHTML = "<span class='text-purple-400'>[QUANTUM OPTICS]:</span> Integrovaná termovize a multispektrální skener mapující strukturu reality pro Gemini.";
-            } else if (part === 'Battery') {
-                details.innerHTML = "<span class='text-amber-400'>[SOLID-STATE BATTERY]:</span> Grafenový článek s okamžitou rezonanční obnovou náboje přes okolní magnetické pole.";
+        // Hloubkový technický popis funkčnosti jednotlivých zón
+        function inspectZone(zone) {
+            const details = document.getElementById('zoneInspectionDetails');
+            if (zone === 'Fusion') {
+                details.innerHTML = "<span class='text-purple-400 font-bold'>[IMF FÚZE]:</span> Od mořské vody po čistou síť. Surová voda prochází separací deuteria. To je vstřikováno do magnetické komory, kde pod laserovými impulsy dochází k inerciální fúzi. Teplo generuje plazmatický proud napojený rovnou na generátory elektrárny.";
+            } else if (zone === 'Geo') {
+                details.innerHTML = "<span class='text-amber-400 font-bold'>[EGS GEOTERMÁL]:</span> Hlubinné vrty pronikají 5-10 km pod zemský povrch do horkých skalních masivů. Studená voda je pumpována dolů, ohřívá se na 350°C a pod obrovským tlakem stoupá druhým vrtem vzhůru, kde roztáčí parní turbíny elektrárny základního zatížení.";
+            } else if (zone === 'Distribution') {
+                details.innerHTML = "<span class='text-blue-400 font-bold'>[SMART STORAGE & TRANS]:</span> Když města spí, fúze a geotermál jedou dál. Systém automaticky přepne přebytečnou energii do vysokoteplotních elektrolyzérů, které štěpí vodu na zelený vodík. Ten je stlačen v tancích. Páteřní HVDC linky mezitím rozvádějí proud přes kontinenty.";
+            } else if (zone === 'AI') {
+                details.innerHTML = "<span class='text-cyan-400 font-bold'>[AI INTEGRATED CORE]:</span> Globální gigant. Superpočítače AI nespotřebovávají energii z veřejné sítě, ale tvoří přímo vnitřní patro fúzní elektrárny. Jsou chlazeny odpadním chladivem a v nanosekundách vyhodnocují data z mobilních uzlů, aby balancovaly planetární spotřebu.";
             }
         }
 
@@ -351,21 +291,9 @@
             ctx.lineWidth = 1.5;
             ctx.stroke();
 
-            ctx.beginPath();
-            ctx.arc(cx, cy, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(147, 51, 234, 0.3)';
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(cx - 90, cy); ctx.lineTo(cx - 30, cy);
-            ctx.moveTo(cx + 30, cy); ctx.lineTo(cx + 90, cy);
-            ctx.strokeStyle = 'rgba(6, 182, 212, 0.6)';
-            ctx.stroke();
-            
             ctx.fillStyle = 'rgba(6, 182, 212, 0.7)';
             ctx.font = '8px monospace';
-            ctx.fillText("SYS_REF: AETHER_GRID_INTELLIGENCE", 20, canvas.height - 120);
-            ctx.fillText(`NODE_LATENCY: ${(15 + Math.random()*20).toFixed(0)}ms`, 20, canvas.height - 105);
+            ctx.fillText("SYS_REF: AETHER_GLOBAL_GRID", 20, canvas.height - 120);
         }
 
         function resizeCanvas() {
