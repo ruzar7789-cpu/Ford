@@ -13,12 +13,10 @@
         .glow-matrix { animation: matrixGlow 2s infinite ease-in-out; }
         @keyframes matrixGlow { 0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); } 50% { border-color: rgba(147, 51, 234, 0.6); box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); } }
         
-        /* Globální vizualizační vrstva infrastruktury */
+        /* Celoobrazovkový vizuální simulátor konceptu */
         #systemViewer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, #070b14 0%, #030712 100%);
-            z-index: 30; display: none; flex-direction: column; justify-content: space-between; padding: 15px;
-            overflow-y: auto;
+            background: #050b14; z-index: 30; display: none; flex-direction: column; padding: 15px;
         }
     </style>
 </head>
@@ -65,7 +63,7 @@
             </div>
             <div>
                 <button onclick="toggleSystemViewer(true)" class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded px-1 py-1 text-[8px] uppercase font-bold tracking-widest animate-pulse">
-                    🗺️ ZOBRAZIT CELÝ KONCEPT
+                    🗺️ VIZUÁLNÍ KONCEPT SÍTĚ
                 </button>
             </div>
         </div>
@@ -83,67 +81,20 @@
     <div id="systemViewer">
         <div class="flex justify-between items-center border-b border-gray-800 pb-2">
             <div>
-                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid Intelligence — Kompletní Ekosystém</h2>
-                <span class="text-[8px] text-gray-500">SCHÉMA INFRASTRUKTURY OD ZÁKLADU PO ELEKTRÁRNU</span>
+                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid Intelligence — Živá Simulace</h2>
+                <span class="text-[8px] text-gray-500">GRAFICKÝ MAPOVÝ MODEL OD VRTU A FÚZE AŽ PO ELEKTRÁRNU</span>
             </div>
             <button onclick="toggleSystemViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs">
                 ZAVŘÍT X
             </button>
         </div>
 
-        <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-3 my-3">
-            
-            <div class="bg-gray-950/80 p-3 rounded-xl border border-purple-500/20 flex flex-col justify-between">
-                <div>
-                    <span class="text-[9px] font-bold text-purple-400 block">⚡ PILÍŘ 1: DECENTRALIZOVANÁ FÚZE (IMF)</span>
-                    <p class="text-[9px] text-gray-400 mt-1">
-                        <strong>Základ:</strong> Mořská voda s vysokým obsahem deuterické složky.<br>
-                        <strong>Elektrárna:</strong> Inerciálně-magnetizovaný pulzní fúzní reaktor, který přeměňuje energii plazmatu přímo na gigawatty čistého proudu bez radioaktivního odpadu.
-                    </p>
-                </div>
-                <button onclick="inspectZone('Fusion')" class="mt-2 w-full bg-purple-950/50 border border-purple-500/40 rounded py-1 text-[8px] text-purple-300 font-bold uppercase tracking-wider">Prověřit Fúzní Komplex</button>
-            </div>
-
-            <div class="bg-gray-950/80 p-3 rounded-xl border border-amber-500/20 flex flex-col justify-between">
-                <div>
-                    <span class="text-[9px] font-bold text-amber-400 block">🌋 PILÍŘ 2: HLUBINNÁ GEOTERMÁLNÍ ENERGIE (EGS)</span>
-                    <p class="text-[9px] text-gray-400 mt-1">
-                        <strong>Základ:</strong> Teplo zemského jádra přístupné přes vertikální hlubinné vrty.<br>
-                        <strong>Elektrárna:</strong> Uzavřený hydrotermální okruh s přehřátou kapalinou pohánějící vysokotlaké turbíny. Zajišťuje stoprocentně stabilní základní linii 24/7.
-                    </p>
-                </div>
-                <button onclick="inspectZone('Geo')" class="mt-2 w-full bg-amber-950/50 border border-amber-500/40 rounded py-1 text-[8px] text-amber-300 font-bold uppercase tracking-wider">Prověřit Geotermální Vrty</button>
-            </div>
-
-            <div class="bg-gray-950/80 p-3 rounded-xl border border-blue-500/20 flex flex-col justify-between">
-                <div>
-                    <span class="text-[9px] font-bold text-blue-400 block">💧 DISTRIBUCE: VODÍK & HVDC SBĚRNICE</span>
-                    <p class="text-[9px] text-gray-400 mt-1">
-                        <strong>Konverze přebytků:</strong> Vysokoteplotní elektrolýza přeměňuje nadbytečnou energii na zelený vodík pro masivní akumulační úložiště.<br>
-                        <strong>Dálkový transport:</strong> Vysokonapěťová stejnosměrná síť (HVDC) přelévá energii napříč kontinenty s nulovými ztrátami.
-                    </p>
-                </div>
-                <button onclick="inspectZone('Distribution')" class="mt-2 w-full bg-blue-950/50 border border-blue-500/40 rounded py-1 text-[8px] text-blue-300 font-bold uppercase tracking-wider">Prověřit Distribuci sítě</button>
-            </div>
-
-            <div class="bg-gray-950/80 p-3 rounded-xl border border-cyan-500/20 flex flex-col justify-between">
-                <div>
-                    <span class="text-[9px] font-bold text-cyan-400 block">🧠 DATA & SPOTŘEBA: AI INTEGRACE</span>
-                    <p class="text-[9px] text-gray-400 mt-1">
-                        <strong>Konečná spotřeba:</strong> Celosvětová síť měst řízená chytrými edge uzly.<br>
-                        <strong>AI Superpočítače:</strong> Datová jádra procesorů jsou fyzicky integrovaná přímo u fúzních elektráren pro přísun čisté energie s nulovou latencí.
-                    </p>
-                </div>
-                <button onclick="inspectZone('AI')" class="mt-2 w-full bg-cyan-950/50 border border-cyan-500/40 rounded py-1 text-[8px] text-cyan-300 font-bold uppercase tracking-wider">Prověřit AI Superpočítač</button>
-            </div>
-
+        <div class="flex-grow my-2 relative bg-black rounded-xl border border-gray-900 overflow-hidden">
+            <canvas id="conceptCanvas" class="w-full h-full"></canvas>
         </div>
 
-        <div class="bg-gray-950 border border-emerald-500/30 p-3 rounded-xl text-center">
-            <span class="text-[8px] font-bold text-emerald-400 uppercase tracking-widest block">HLOUBKOVÝ DIGITÁLNÍ INSPEKTOR UZLŮ</span>
-            <div id="zoneInspectionDetails" class="text-[10px] text-gray-300 italic mt-1 font-mono">
-                "Klepnutím na jakýkoliv sektor výše zobrazíš technický popis od základu až po hotový komplex."
-            </div>
+        <div class="bg-gray-950 border border-emerald-500/20 p-2 rounded-xl text-[10px] text-gray-400 font-mono" id="conceptDescription">
+            "Klepnutím na obrazovku výše prozkoumáš jednotlivé části animované elektrárenské infrastruktury."
         </div>
     </div>
 
@@ -159,23 +110,171 @@
         let animationId = null;
         let streamInterval = null;
 
+        // Nastavení plátna pro vizuální koncept
+        const cCanvas = document.getElementById('conceptCanvas');
+        const cCtx = cCanvas.getContext('2d');
+        let tick = 0;
+
+        window.addEventListener('load', () => {
+            setTimeout(toggleCloudBridge, 500);
+            startTelemetrySimulation();
+            setupConceptCanvas();
+            animateConceptLoop();
+        });
+
         function toggleSystemViewer(show) {
             document.getElementById('systemViewer').style.display = show ? 'flex' : 'none';
+            if(show) setupConceptCanvas();
         }
 
-        // Hloubkový technický popis funkčnosti jednotlivých zón
-        function inspectZone(zone) {
-            const details = document.getElementById('zoneInspectionDetails');
-            if (zone === 'Fusion') {
-                details.innerHTML = "<span class='text-purple-400 font-bold'>[IMF FÚZE]:</span> Od mořské vody po čistou síť. Surová voda prochází separací deuteria. To je vstřikováno do magnetické komory, kde pod laserovými impulsy dochází k inerciální fúzi. Teplo generuje plazmatický proud napojený rovnou na generátory elektrárny.";
-            } else if (zone === 'Geo') {
-                details.innerHTML = "<span class='text-amber-400 font-bold'>[EGS GEOTERMÁL]:</span> Hlubinné vrty pronikají 5-10 km pod zemský povrch do horkých skalních masivů. Studená voda je pumpována dolů, ohřívá se na 350°C a pod obrovským tlakem stoupá druhým vrtem vzhůru, kde roztáčí parní turbíny elektrárny základního zatížení.";
-            } else if (zone === 'Distribution') {
-                details.innerHTML = "<span class='text-blue-400 font-bold'>[SMART STORAGE & TRANS]:</span> Když města spí, fúze a geotermál jedou dál. Systém automaticky přepne přebytečnou energii do vysokoteplotních elektrolyzérů, které štěpí vodu na zelený vodík. Ten je stlačen v tancích. Páteřní HVDC linky mezitím rozvádějí proud přes kontinenty.";
-            } else if (zone === 'AI') {
-                details.innerHTML = "<span class='text-cyan-400 font-bold'>[AI INTEGRATED CORE]:</span> Globální gigant. Superpočítače AI nespotřebovávají energii z veřejné sítě, ale tvoří přímo vnitřní patro fúzní elektrárny. Jsou chlazeny odpadním chladivem a v nanosekundách vyhodnocují data z mobilních uzlů, aby balancovaly planetární spotřebu.";
-            }
+        function setupConceptCanvas() {
+            cCanvas.width = cCanvas.parentElement.clientWidth;
+            cCanvas.height = cCanvas.parentElement.clientHeight;
         }
+
+        // Živá grafická animace celého konceptu od základu země po fúzi a elektrárnu
+        function animateConceptLoop() {
+            requestAnimationFrame(animateConceptLoop);
+            if (document.getElementById('systemViewer').style.display === 'none') return;
+
+            tick++;
+            const w = cCanvas.width;
+            const h = cCanvas.height;
+            cCtx.clearRect(0, 0, w, h);
+
+            // 1. KRESLENÍ ZÁKLADU: VRSTVY ZEMĚ (Spodní část - Geotermál)
+            const groundY = h * 0.65;
+            cCtx.fillStyle = '#0c0705';
+            cCtx.fillRect(0, groundY, w, h - groundY);
+
+            // Pulzující jádro země úplně dole
+            let magmaGlow = cCtx.createLinearGradient(0, h - 50, 0, h);
+            magmaGlow.addColorStop(0, '#1e0b02');
+            magmaGlow.addColorStop(1, '#ff4500');
+            cCtx.fillStyle = magmaGlow;
+            cCtx.fillRect(0, h - 50, w, 50);
+
+            // Hlubinný vrt (EGS Elektrárna)
+            cCtx.strokeStyle = '#f59e0b';
+            cCtx.lineWidth = 3;
+            cCtx.beginPath();
+            cCtx.moveTo(w * 0.25, groundY - 20);
+            cCtx.lineTo(w * 0.25, h - 30);
+            cCtx.stroke();
+
+            // Animovaný tok tepla z hlubinného vrtu nahoru do turbín
+            cCtx.fillStyle = '#ff7f50';
+            let particleY = (h - 30) - ((tick * 2) % (h - 30 - (groundY - 20)));
+            cCtx.beginPath();
+            cCtx.arc(w * 0.25, particleY, 4, 0, Math.PI * 2);
+            cCtx.fill();
+
+            // Budova Geotermální elektrárny na povrchu
+            cCtx.fillStyle = '#1f2937';
+            cCtx.fillRect(w * 0.18, groundY - 40, 70, 40);
+            cCtx.fillStyle = '#f59e0b';
+            cCtx.font = '8px monospace';
+            cCtx.fillText("EGS CORE", w * 0.19, groundY - 25);
+
+            // 2. KRESLENÍ: FÚZNÍ KOMPLEX (IMF - Levá/Horní část nad vodou)
+            // Mořská hladina na pravé straně
+            cCtx.fillStyle = '#041122';
+            cCtx.fillRect(w * 0.5, groundY - 15, w * 0.5, 15);
+            
+            // Fúzní reaktor (Prstenec plazmatu)
+            const fx = w * 0.7;
+            const fy = groundY - 90;
+            cCtx.strokeStyle = '#9333ea';
+            cCtx.lineWidth = 4;
+            cCtx.beginPath();
+            cCtx.arc(fx, fy, 25, 0, Math.PI * 2);
+            cCtx.stroke();
+
+            // Pulzující plazmatické jádro uvnitř reaktoru
+            cCtx.fillStyle = `rgba(6, 182, 212, ${0.4 + Math.sin(tick*0.1)*0.3})`;
+            cCtx.beginPath();
+            cCtx.arc(fx, fy, 15, 0, Math.PI * 2);
+            cCtx.fill();
+            cCtx.fillStyle = '#a855f7';
+            cCtx.fillText("IMF FUSION", fx - 28, fy - 35);
+
+            // Nasávání deuteria z moře do fúze
+            cCtx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
+            cCtx.lineWidth = 1.5;
+            cCtx.beginPath();
+            cCtx.moveTo(w * 0.8, groundY - 10);
+            cCtx.lineTo(w * 0.8, fy);
+            cCtx.lineTo(fx + 25, fy);
+            cCtx.stroke();
+
+            // 3. KRESLENÍ SÍTĚ: HVDC DRÁTY A VODÍKOVÝ MANAGEMENT (Střed)
+            const cx = w * 0.5;
+            const cy = groundY - 60;
+            cCtx.fillStyle = '#111827';
+            cCtx.fillRect(cx - 30, cy - 20, 60, 35);
+            cCtx.strokeStyle = '#3b82f6';
+            cCtx.lineWidth = 1;
+            cCtx.strokeRect(cx - 30, cy - 20, 60, 35);
+            cCtx.fillStyle = '#3b82f6';
+            cCtx.fillText("IoE GRID", cx - 24, cy - 4);
+
+            // Propojení zdrojů do centrální sítě IoE
+            cCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+            cCtx.beginPath();
+            cCtx.moveTo(w * 0.25, groundY - 40); cCtx.lineTo(cx - 30, cy);
+            cCtx.moveTo(fx - 25, fy); cCtx.lineTo(cx + 30, cy);
+            cCtx.stroke();
+
+            // 4. KRESLENÍ SPOTŘEBY: KONEČNÉ MĚSTO A INTEGRACE AI (Vlevo nahoře)
+            cCtx.fillStyle = '#0f172a';
+            cCtx.fillRect(20, 40, 80, 70);
+            cCtx.strokeStyle = '#06b6d4';
+            cCtx.strokeRect(20, 40, 80, 70);
+            
+            // Okna mrakodrapů
+            cCtx.fillStyle = '#334155';
+            for(let mx = 30; mx < 90; mx += 15) {
+                for(let my = 50; my < 100; my += 15) {
+                    cCtx.fillRect(mx, my, 8, 8);
+                }
+            }
+            cCtx.fillStyle = '#06b6d4';
+            cCtx.fillText("AI MEGACITY", 25, 33);
+
+            // Přenos energie z centrálního IoE uzlu rovnou do města
+            cCtx.strokeStyle = '#06b6d4';
+            cCtx.lineWidth = 2;
+            cCtx.beginPath();
+            cCtx.moveTo(cx - 30, cy - 10);
+            cCtx.lineTo(60, cy - 10);
+            cCtx.lineTo(60, 110);
+            cCtx.stroke();
+
+            // Animované toky elektronů proudící po drátech do mrakodrapů měst
+            cCtx.fillStyle = '#00ffcc';
+            let energyX = (cx - 30) - ((tick * 1.5) % (cx - 30 - 60));
+            cCtx.beginPath();
+            cCtx.arc(energyX, cy - 10, 3, 0, Math.PI * 2);
+            cCtx.fill();
+        }
+
+        // Změna popisků na základě souřadnic kliknutí pro interaktivní mapu
+        cCanvas.addEventListener('click', (e) => {
+            const rect = cCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            const desc = document.getElementById('conceptDescription');
+
+            if (clickY > cCanvas.height * 0.65) {
+                desc.innerHTML = "<span class='text-amber-400'>[ZÁKLAD ZEMĚ & GEOTERMÁL]:</span> Detekovány hluboké tektonické vrstvy zemské kůry v hloubce 7 km. Přehřáté skalní masivy ohřívají vodu na 350°C, která pod tlakem stoupá do turbín EGS elektrárny a stabilizuje celou planetární rozvodnou síť 24 hodin denně.";
+            } else if (clickX > cCanvas.width * 0.55) {
+                desc.innerHTML = "<span class='text-purple-400'>[IMF JADERNÁ FÚZE]:</span> Pulzní magnetický prstenec elektrárny. Nasává deuterium extrahované přímo z oceánu na pravé straně. Laserové zapálení vytváří čisté plazmatické výboje s okamžitým výkonem přes 90 GW bez radioaktivního odpadu.";
+            } else if (clickX < cCanvas.width * 0.35) {
+                desc.innerHTML = "<span class='text-cyan-400'>[AI INFRASTRUKTURA & MĚSTO]:</span> Konečné spotřební centrum. Zde jsou superpočítačová jádra integrovaná přímo u zdrojů. AI v nanosekundách balancuje napětí, přesměrovává přebytky elektřiny do vodíkových zásobníků a bez ztrát zásobuje celá autonomní města.";
+            } else {
+                desc.innerHTML = "<span class='text-blue-400'>[CENTRÁLNÍ RIADENIE IoE]:</span> Internet of Energy (IoE) most. Sběrnice, která chytře rozděluje výkon mezi dálkovou stejnosměrnou síť HVDC a vysokoteplotní elektrolyzéry na akumulaci zeleného vodíku.";
+            }
+        });
 
         async function toggleCloudBridge() {
             if (isStreaming) {
@@ -311,11 +410,4 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             document.getElementById('streamBtn').innerText = "🌀 ROZSVÍTIT ON-LINE MOST";
-            document.getElementById('streamBtn').className = "w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-black py-4 rounded-xl text-xs uppercase";
-            document.getElementById('netStatus').innerText = "OFFLINE / DISCONNECTED";
-            document.getElementById('netStatus').className = "text-[9px] text-rose-500 font-mono tracking-widest mt-0.5";
-            document.getElementById('aiStatusText').innerText = '"Most uzavřen. Globální uzel odpojen..."';
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('streamBtn').className = "w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-b
