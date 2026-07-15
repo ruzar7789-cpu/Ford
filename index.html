@@ -3,327 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aether Grid Intelligence v5.0 — Control Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Focus LPG Companion</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #030712; color: #d1d5db; font-family: monospace; }
-        #arCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-        #bgVideo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.4; }
-        .ui-overlay { position: absolute; z-index: 20; }
-        .glow-matrix { animation: matrixGlow 2s infinite ease-in-out; }
-        @keyframes matrixGlow { 0%, 100% { border-color: rgba(6, 182, 212, 0.3); box-shadow: 0 0 10px rgba(6, 182, 212, 0.1); } 50% { border-color: rgba(147, 51, 234, 0.6); box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); } }
-        
-        /* Celoobrazovkový vizuální overlay pro koncept */
-        #systemViewer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #050b14; z-index: 50; display: none; flex-direction: column; padding: 15px;
+        :root {
+            --bg-color: #1e222b;
+            --card-bg: #282c34;
+            --primary-color: #007acc;
+            --accent-color: #4fc3f7;
+            --text-color: #abb2bf;
+            --text-light: #ffffff;
+            --success-color: #98c379;
+            --warning-color: #e5c07b;
+            --danger-color: #e06c75;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 90px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            color: var(--text-light);
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-bg);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-top: 2px solid #3e4451;
+            z-index: 1000;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 15px 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-color);
+            border-top: 3px solid var(--accent-color);
+            background-color: rgba(255,255,255,0.02);
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Dashboard/OBD Styling */
+        .obd-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button.btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+        }
+
+        button.btn:hover {
+            opacity: 0.9;
+        }
+
+        button.btn-demo {
+            background-color: #4b5263;
+        }
+
+        button.btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .gauge-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .gauge {
+            background: radial-gradient(circle, #2c313c 0%, #1e222b 100%);
+            border: 4px solid #3e4451;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .gauge-large {
+            grid-column: span 2;
+            width: 60%;
+            margin: 0 auto 15px auto;
+        }
+
+        .gauge-val {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .gauge-large .gauge-val {
+            font-size: 3rem;
+            color: var(--accent-color);
+        }
+
+        .gauge-unit {
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+
+        #obd-log {
+            background-color: #1e222b;
+            color: #98c379;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 6px;
+            height: 80px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+        }
+
+        /* Diagnostic / DTC Styling */
+        .dtc-box {
+            background-color: #1e222b;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+        }
+
+        .dtc-item {
+            border-left: 4px solid var(--danger-color);
+            background-color: rgba(224, 108, 117, 0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .dtc-code {
+            font-weight: bold;
+            color: var(--danger-color);
+            font-size: 1.1rem;
+        }
+
+        .dtc-desc {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .dtc-empty {
+            color: var(--success-color);
+            text-align: center;
+            font-weight: bold;
+            padding: 20px 0;
+        }
+
+        /* Maintenance Progress Bars */
+        .maintenance-item {
+            margin-bottom: 15px;
+        }
+
+        .maintenance-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .progress-bar-bg {
+            background-color: #1e222b;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            width: 100%;
+            transition: width 0.5s;
+        }
+
+        .progress-bar.warning {
+            background-color: var(--warning-color);
+        }
+
+        .progress-bar.danger {
+            background-color: var(--danger-color);
+        }
+
+        /* Calculator Styling */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .calc-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calc-group label {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .calc-group input {
+            background-color: #1e222b;
+            border: 1px solid #3e4451;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .savings-result {
+            background-color: rgba(152, 195, 121, 0.1);
+            border: 1px dashed var(--success-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .savings-result h3 {
+            color: var(--success-color);
+            font-size: 1.5rem;
+        }
+
+        /* Service Log */
+        .log-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .log-form input, .log-form textarea {
+            background-color: #1e222b;
+            border: 1px solid #3e4451;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .log-item {
+            background-color: #1e222b;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .log-item-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <video id="bgVideo" autoplay playsinline muted></video>
-    <canvas id="arCanvas"></canvas>
+    <header>
+        <h1>Focus MK2.5 2.0 LPG</h1>
+        <p>3D Hatchback | Duratec 107 kW</p>
+    </header>
 
-    <div class="ui-overlay top-4 left-4 right-4 grid grid-cols-2 gap-2 md:grid-cols-4 pointer-events-none">
-        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-cyan-500/30">
-            <h1 class="text-[11px] font-black tracking-wider text-cyan-400 uppercase">🌌 AGI-GRID CORE</h1>
-            <p id="netStatus" class="text-[9px] text-emerald-400 font-mono tracking-widest mt-0.5">ONLINE / SYNC ACTIVE</p>
-        </div>
+    <div class="container">
         
-        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-purple-500/20">
-            <span class="text-[8px] text-purple-400 block tracking-wider uppercase">FÚZNÍ REAKTOR (IMF)</span>
-            <div class="text-xs font-bold text-purple-300 mt-0.5" id="fusionOutput">94.2 GW</div>
-        </div>
+        <!-- ================= TAB 1: DASHBOARD (OBD2) ================= -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="card">
+                <h2>OBD-II Živá Data</h2>
+                <div class="obd-controls">
+                    <button class="btn" id="btn-connect">Připojit Auto</button>
+                    <button class="btn btn-demo" id="btn-demo">Demo Režim</button>
+                </div>
 
-        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-amber-500/20">
-            <span class="text-[8px] text-amber-400 block tracking-wider uppercase">GEOTERMÁLNÍ VRTY (EGS)</span>
-            <div class="text-xs font-bold text-amber-300 mt-0.5" id="geoOutput">41.8 GW</div>
-        </div>
+                <div class="gauge-container">
+                    <div class="gauge gauge-large">
+                        <div class="gauge-val" id="val-rpm">0</div>
+                        <div class="gauge-unit">OTÁČKY (RPM)</div>
+                    </div>
+                    <div class="gauge">
+                        <div class="gauge-val" id="val-speed">0</div>
+                        <div class="gauge-unit">RYCHLOST (km/h)</div>
+                    </div>
+                    <div class="gauge">
+                        <div class="gauge-val" id="val-temp">0</div>
+                        <div class="gauge-unit">TEPLOTA MOTORU (°C)</div>
+                    </div>
+                </div>
 
-        <div class="bg-gray-950/90 backdrop-blur-md p-3 rounded-xl border border-blue-500/20 flex justify-between items-center">
-            <div>
-                <span class="text-[8px] text-blue-400 block tracking-wider uppercase">DYNAMICKÉ PŘETÍŽENÍ</span>
-                <div class="text-xs font-bold text-blue-300 mt-0.5" id="gForceDisplay">1.00 G</div>
+                <div id="obd-log">Systém připraven k propojení přes Bluetooth...</div>
             </div>
-            <div class="bg-emerald-500/20 text-emerald-400 text-[9px] px-2 py-0.5 rounded-full border border-emerald-500/30" id="h2Status">H₂ AKUMULACE</div>
         </div>
+
+        <!-- ================= TAB 2: DIAGNOSTIKA CHYB (DTC) ================= -->
+        <div id="tab-dtc" class="tab-content">
+            <div class="card">
+                <h2>Chybové kódy (Diagnostika OBD-II)</h2>
+                <p style="font-size: 0.85rem; margin-bottom: 15px;">Zde můžete načíst a vymazat chybové kódy z řídicí jednotky motoru (ECU) Focusu.</p>
+                
+                <div class="obd-controls">
+                    <button class="btn" id="btn-scan-dtc">Načíst chyby (Příkaz 03)</button>
+                    <button class="btn btn-danger" id="btn-clear-dtc">Smazat chyby (Příkaz 04)</button>
+                </div>
+
+                <div class="dtc-box" id="dtc-container">
+                    <div class="dtc-empty">Diagnostika nespuštěna. Propojte se s autem a klikněte na načtení chyb.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: ÚDRŽBA ================= -->
+        <div id="tab-maintenance" class="tab-content">
+            <div class="card">
+                <h2>Hlídač kritických intervalů</h2>
+                
+                <div class="maintenance-item">
+                    <div class="maintenance-header">
+                        <span>Ventilové vůle (LPG ochrana)</span>
+                        <span id="lbl-valves">Zbývá: 30 000 km</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="bar-valves" class="progress-bar"></div>
+                    </div>
+                </div>
+
+                <div class="maintenance-item">
+                    <div class="maintenance-header">
+                        <span>Výměna LPG filtrů</span>
+                        <span id="lbl-filters">Zbývá: 15 000 km</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="bar-filters" class="progress-bar"></div>
+                    </div>
+                </div>
+
+                <div class="maintenance-item">
+                    <div class="maintenance-header">
+                        <span>Motorový olej 5W-30 (LPG interval)</span>
+                        <span id="lbl-oil">Zbývá: 10 000 km</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="bar-oil" class="progress-bar"></div>
+                    </div>
+                </div>
+
+                <div class="maintenance-item">
+                    <div class="maintenance-header">
+                        <span>Platnost LPG Bomby (2028)</span>
+                        <span id="lbl-tank">Zbývá: -- dní</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="bar-tank" class="progress-bar"></div>
+                    </div>
+                </div>
+                
+                <p style="font-size: 0.75rem; color: var(--text-color); text-align: center; margin-top: 10px;">
+                    Intervaly jsou zkráceny pro optimální ochranu nové hlavy válců na LPG.
+                </p>
+            </div>
+        </div>
+
+        <!-- ================= TAB 4: KALKULAČKA ================= -->
+        <div id="tab-calculator" class="tab-content">
+            <div class="card">
+                <h2>Kalkulačka úspory LPG</h2>
+                <div class="calc-grid">
+                    <div class="calc-group">
+                        <label>Cena Benzínu (Kč/l)</label>
+                        <input type="number" id="price-gas" value="38.50">
+                    </div>
+                    <div class="calc-group">
+                        <label>Cena LPG (Kč/l)</label>
+                        <input type="number" id="price-lpg" value="16.90">
+                    </div>
+                    <div class="calc-group">
+                        <label>Spotřeba LPG (l/100km)</label>
+                        <input type="number" id="cons-lpg" value="9.2">
+                    </div>
+                    <div class="calc-group">
+                        <label>Najeté km ročně</label>
+                        <input type="number" id="km-yearly" value="15000">
+                    </div>
+                </div>
+
+                <div class="savings-result">
+                    <p>Vaše roční úspora oproti benzínu činí cca:</p>
+                    <h3 id="calc-savings">0 Kč</h3>
+                    <p style="font-size: 0.8rem; margin-top: 5px; color: var(--text-color);" id="calc-cost-per-km">
+                        Náklady na kilometr: 0 Kč
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 5: SERVISNÍ KNIHA ================= -->
+        <div id="tab-log" class="tab-content">
+            <div class="card">
+                <h2>Digitální Servisní Kniha</h2>
+                <div class="log-form">
+                    <input type="number" id="log-km" placeholder="Nájezd v km (např. 299500)">
+                    <textarea id="log-desc" placeholder="Co se na autě dělalo..." rows="2"></textarea>
+                    <button class="btn" id="btn-add-log">Přidat záznam</button>
+                </div>
+
+                <div class="log-list" id="log-list-container">
+                    <!-- Sem se budou dynamicky renderovat záznamy -->
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="ui-overlay bottom-6 left-4 right-4 flex flex-col gap-3">
-        
-        <div class="bg-gray-950/95 backdrop-blur-md p-3 rounded-xl border border-gray-800 text-[10px] grid grid-cols-3 gap-2 text-center font-mono">
-            <div>
-                <span class="text-gray-500 block uppercase text-[8px]">Lokální Spotřeba</span>
-                <span class="text-cyan-400 font-bold" id="localDemand">62.4%</span>
-            </div>
-            <div>
-                <span class="text-gray-500 block uppercase text-[8px]">HVDC Dálkový Přenos</span>
-                <span class="text-indigo-400 font-bold" id="hvdcFlow">73.1 GW</span>
-            </div>
-            <div>
-                <button onclick="toggleSystemViewer(true)" class="w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded px-1 py-2 text-[8px] uppercase font-bold tracking-widest animate-pulse pointer-events-auto">
-                    🗺️ VIZUÁLNÍ KONCEPT SÍTÊ
-                </button>
-            </div>
-        </div>
-        
-        <div id="aiResponseBox" class="bg-gray-950/95 backdrop-blur-md p-4 rounded-2xl border border-gray-800 text-center glow-matrix">
-            <span class="text-[9px] uppercase font-bold text-cyan-400 block tracking-widest">KOGNITIVNÍ ARCHITEKTURA NE X U S</span>
-            <div id="aiStatusText" class="text-xs text-gray-300 italic mt-2">"Inicializuji globální energetickou sběrnici... Skenuji uzel."</div>
-        </div>
-
-        <button id="streamBtn" onclick="toggleCloudBridge()" class="w-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 text-white font-black py-4 rounded-xl transition duration-300 transform active:scale-[0.98] tracking-wider uppercase text-xs shadow-lg shadow-cyan-500/20">
-            🌀 RESETOVAT / SYNC ON-LINE MOST
-        </button>
-    </div>
-
-    <div id="systemViewer">
-        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-            <div>
-                <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Aether Grid — Živá Simulace</h2>
-                <span class="text-[8px] text-gray-500">KLIKNI NA SEKTOR PRO DETAILNÍ INSPEKCI</span>
-            </div>
-            <button onclick="toggleSystemViewer(false)" class="bg-rose-500/20 text-rose-400 border border-rose-500/40 px-3 py-1 rounded text-xs font-bold">
-                ZAVŘÍT ✕
-            </button>
-        </div>
-
-        <div class="flex-grow my-2 relative bg-black rounded-xl border border-gray-900 overflow-hidden min-h-[250px]">
-            <canvas id="conceptCanvas"></canvas>
-        </div>
-
-        <div class="bg-gray-950 border border-emerald-500/20 p-3 rounded-xl text-[10px] text-gray-300 font-mono text-center min-h-[60px]" id="conceptDescription">
-            "Klepnutím na obrazovku výše prozkoumáš součásti elektrárenské infrastruktury (Fúze, Geotermál, Město)."
-        </div>
-    </div>
-
-    <canvas id="hiddenCanvas" class="hidden"></canvas>
+    <!-- SPODNÍ NAVIGACE -->
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="switchTab('dashboard')">📟 Budíky</button>
+        <button class="tab-btn" onclick="switchTab('dtc')">⚠️ Chyby</button>
+        <button class="tab-btn" onclick="switchTab('maintenance')">🔧 Údržba</button>
+        <button class="tab-btn" onclick="switchTab('calculator')">🧮 Úspora</button>
+        <button class="tab-btn" onclick="switchTab('log')">📓 Servis</button>
+    </nav>
 
     <script>
-        let isStreaming = false;
-        let video = document.getElementById('bgVideo');
-        let canvas = document.getElementById('arCanvas');
-        let ctx = canvas.getContext('2d');
-        let streamRef = null;
-        let lastG = 1.0;
-        let animationId = null;
-        let streamInterval = null;
-
-        // Nastavení plátna pro vizuální koncept
-        const cCanvas = document.getElementById('conceptCanvas');
-        const cCtx = cCanvas.getContext('2d');
-        let tick = 0;
-
-        window.addEventListener('load', () => {
-            startTelemetrySimulation();
-            // Spustíme vykreslovací smyčku hned na pozadí
-            setupConceptCanvas();
-            animateConceptLoop();
-        });
-
-        // Oprava resize chování canvasu, aby se správně přizpůsobil oknu mobilu
-        function toggleSystemViewer(show) {
-            document.getElementById('systemViewer').style.display = show ? 'flex' : 'none';
-            if(show) {
-                setTimeout(setupConceptCanvas, 50);
-            }
+        // --- PŘEPÍNÁNÍ TABŮ ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        function setupConceptCanvas() {
-            const container = cCanvas.parentElement;
-            cCanvas.width = container.clientWidth;
-            cCanvas.height = container.clientHeight;
+        // --- KALKULAČKA ÚSPOR ---
+        const priceGas = document.getElementById('price-gas');
+        const priceLpg = document.getElementById('price-lpg');
+        const consLpg = document.getElementById('cons-lpg');
+        const kmYearly = document.getElementById('km-yearly');
+        const calcSavingsResult = document.getElementById('calc-savings');
+        const calcCostPerKm = document.getElementById('calc-cost-per-km');
+
+        function calculateSavings() {
+            const pGas = parseFloat(priceGas.value) || 0;
+            const pLpg = parseFloat(priceLpg.value) || 0;
+            const cLpg = parseFloat(consLpg.value) || 0;
+            const km = parseFloat(kmYearly.value) || 0;
+
+            const cGas = 8.0;
+
+            const costGasPerKm = (cGas * pGas) / 100;
+            const costLpgPerKm = (cLpg * pLpg) / 100;
+
+            const yearlyGasCost = costGasPerKm * km;
+            const yearlyLpgCost = costLpgPerKm * km;
+
+            const totalSaved = Math.round(yearlyGasCost - yearlyLpgCost);
+
+            calcSavingsResult.innerText = totalSaved > 0 ? `${totalSaved.toLocaleString()} Kč / rok` : "0 Kč";
+            calcCostPerKm.innerText = `Náklady na LPG: ${costLpgPerKm.toFixed(2)} Kč/km (oproti benzínu za ${costGasPerKm.toFixed(2)} Kč/km)`;
         }
 
-        window.addEventListener('resize', setupConceptCanvas);
+        [priceGas, priceLpg, consLpg, kmYearly].forEach(el => el.addEventListener('input', calculateSavings));
+        calculateSavings();
 
-        // Živá grafická animace celého konceptu od základu země po fúzi a elektrárnu
-        function animateConceptLoop() {
-            requestAnimationFrame(animateConceptLoop);
-            if (document.getElementById('systemViewer').style.display === 'none') return;
+        // --- SERVISNÍ KNIHA (uloženo v LocalStorage) ---
+        const defaultLogs = [
+            { km: 298000, desc: "⚠️ Kompletní repase a nová hlava válců (tvrzená sedla ventilů pro LPG, nová těsnění, seřízení vůlí).", date: "Červenec 2026" }
+        ];
 
-            tick++;
-            const w = cCanvas.width;
-            const h = cCanvas.height;
-            
-            if(w === 0 || h === 0) return;
-            
-            cCtx.clearRect(0, 0, w, h);
-
-            // 1. VRSTVY ZEMĚ (Spodní část - Geotermál)
-            const groundY = h * 0.60;
-            cCtx.fillStyle = '#0c0705';
-            cCtx.fillRect(0, groundY, w, h - groundY);
-
-            // Žhnoucí magma úplně dole
-            let magmaGlow = cCtx.createLinearGradient(0, h - 40, 0, h);
-            magmaGlow.addColorStop(0, '#1e0b02');
-            magmaGlow.addColorStop(1, '#ff4500');
-            cCtx.fillStyle = magmaGlow;
-            cCtx.fillRect(0, h - 40, w, 40);
-
-            // Vertikální hlubinný vrt (EGS)
-            cCtx.strokeStyle = '#f59e0b';
-            cCtx.lineWidth = 3;
-            cCtx.beginPath();
-            cCtx.moveTo(w * 0.25, groundY - 15);
-            cCtx.lineTo(w * 0.25, h - 25);
-            cCtx.stroke();
-
-            // Energie stoupající z vrtu
-            cCtx.fillStyle = '#ff7f50';
-            let particleY = (h - 25) - ((tick * 2) % (h - 25 - (groundY - 15)));
-            cCtx.beginPath();
-            cCtx.arc(w * 0.25, particleY, 4, 0, Math.PI * 2);
-            cCtx.fill();
-
-            // Budova Geotermálu
-            cCtx.fillStyle = '#1f2937';
-            cCtx.fillRect(w * 0.15, groundY - 35, 70, 35);
-            cCtx.fillStyle = '#f59e0b';
-            cCtx.font = '9px monospace';
-            cCtx.fillText("EGS SYSTEM", w * 0.17, groundY - 20);
-
-            // 2. FÚZNÍ REAKTOR (IMF)
-            cCtx.fillStyle = '#041122';
-            cCtx.fillRect(w * 0.55, groundY - 15, w * 0.45, 15); // Mořská hladina
-            
-            const fx = w * 0.75;
-            const fy = groundY - 80;
-            
-            cCtx.strokeStyle = '#9333ea';
-            cCtx.lineWidth = 4;
-            cCtx.beginPath();
-            cCtx.arc(fx, fy, 22, 0, Math.PI * 2);
-            cCtx.stroke();
-
-            // Pulzující jádro plazmatu
-            cCtx.fillStyle = `rgba(6, 182, 212, ${0.4 + Math.sin(tick*0.1)*0.3})`;
-            cCtx.beginPath();
-            cCtx.arc(fx, fy, 13, 0, Math.PI * 2);
-            cCtx.fill();
-            cCtx.fillStyle = '#a855f7';
-            cCtx.fillText("IMF FUSION", fx - 25, fy - 30);
-
-            // Trubka nasávání z moře
-            cCtx.strokeStyle = 'rgba(6, 182, 212, 0.5)';
-            cCtx.lineWidth = 2;
-            cCtx.beginPath();
-            cCtx.moveTo(w * 0.85, groundY - 10);
-            cCtx.lineTo(w * 0.85, fy);
-            cCtx.lineTo(fx + 22, fy);
-            cCtx.stroke();
-
-            // 3. CENTRÁLNÍ CHYTRÁ SÍŤ (IoE)
-            const cx = w * 0.5;
-            const cy = groundY - 50;
-            cCtx.fillStyle = '#111827';
-            cCtx.fillRect(cx - 35, cy - 15, 70, 30);
-            cCtx.strokeStyle = '#3b82f6';
-            cCtx.strokeRect(cx - 35, cy - 15, 70, 30);
-            cCtx.fillStyle = '#3b82f6';
-            cCtx.fillText("IoE GRID", cx - 22, cy + 4);
-
-            // Propojovací linky
-            cCtx.strokeStyle = 'rgba(255,255,255,0.15)';
-            cCtx.beginPath();
-            cCtx.moveTo(w * 0.25, groundY - 35); cCtx.lineTo(cx - 35, cy);
-            cCtx.moveTo(fx - 22, fy); cCtx.lineTo(cx + 35, cy);
-            cCtx.stroke();
-
-            // 4. MĚSTO (Spotřeba)
-            cCtx.fillStyle = '#0f172a';
-            cCtx.fillRect(15, 35, 80, 65);
-            cCtx.strokeStyle = '#06b6d4';
-            cCtx.strokeRect(15, 35, 80, 65);
-            
-            cCtx.fillStyle = '#334155';
-            for(let mx = 25; mx < 85; mx += 15) {
-                for(let my = 45; my < 90; my += 15) {
-                    cCtx.fillRect(mx, my, 6, 6);
-                }
-            }
-            cCtx.fillStyle = '#06b6d4';
-            cCtx.fillText("AI MEGACITY", 20, 25);
-
-            // Distribuce do města
-            cCtx.strokeStyle = '#06b6d4';
-            cCtx.lineWidth = 2;
-            cCtx.beginPath();
-            cCtx.moveTo(cx - 35, cy);
-            cCtx.lineTo(55, cy);
-            cCtx.lineTo(55, 100);
-            cCtx.stroke();
-
-            // Animovaný tok energie
-            cCtx.fillStyle = '#00ffcc';
-            let energyX = (cx - 35) - ((tick * 1.5) % (cx - 35 - 55));
-            cCtx.beginPath();
-            cCtx.arc(energyX, cy, 3, 0, Math.PI * 2);
-            cCtx.fill();
+        function getLogs() {
+            const saved = localStorage.getItem('focus_service_logs');
+            return saved ? JSON.parse(saved) : defaultLogs;
         }
 
-        // Interaktivní detekce kliknutí na různé zóny diagramu
-        cCanvas.addEventListener('click', (e) => {
-            const rect = cCanvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            const desc = document.getElementById('conceptDescription');
+        function renderLogs() {
+            const logs = getLogs();
+            const container = document.getElementById('log-list-container');
+            container.innerHTML = '';
+            
+            logs.sort((a,b) => b.km - a.km).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'log-item';
+                div.innerHTML = `
+                    <div class="log-item-header">
+                        <span>${item.km.toLocaleString()} KM</span>
+                        <span>${item.date}</span>
+                    </div>
+                    <div style="color: white; font-size: 0.9rem;">${item.desc}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-            if (clickY > cCanvas.height * 0.60) {
-                desc.innerHTML = "<span class='text-amber-400 font-bold'>[ZÁKLAD ZEMĚ & GEOTERMÁL]:</span> Hlubinný vrt EGS sahá 7 km pod povrch. Čerpá permanentní teplo zemského jádra, mění vodu na vysokotlakou páru o teplotě 350°C a zajišťuje 100% stabilní základní výkon sítě 24/7.";
-            } else if (clickX > cCanvas.width * 0.55) {
-                desc.innerHTML = "<span class='text-purple-400 font-bold'>[IMF JADERNÁ FÚZE]:</span> Inerciální fúzní komplex. Separuje deuterium z mořské vody, které v magnetickém prstenci pod laserovými zážehy vytváří čisté plazmatické výboje o výkonu 94.2 GW bez radioaktivního odpadu.";
-            } else if (clickX < cCanvas.width * 0.35) {
-                desc.innerHTML = "<span class='text-cyan-400 font-bold'>[SPOTŘEBA & AI JÁDRO]:</span> Autonomní Megacity. AI superpočítače vyhodnocují v reálném čase spotřebu uzlů, napájejí infrastrukturu a přebytky bleskově ukládají do vodíkových zásobníků.";
-            } else {
-                desc.innerHTML = "<span class='text-blue-400 font-bold'>[CENTRÁLNÍ SPEKTRUM IoE]:</span> Internet of Energy. Hlavní digitální křižovatka, která přerozděluje energii přes dálkové HVDC linky napříč kontinenty s nulovými přenosovými ztrátami.";
-            }
-        });
+        document.getElementById('btn-add-log').addEventListener('click', () => {
+            const kmInput = document.getElementById('log-km');
+            const descInput = document.getElementById('log-desc');
 
-        async function toggleCloudBridge() {
-            if (isStreaming) {
-                closeCloudBridge();
+            if (!kmInput.value || !descInput.value) {
+                alert('Vyplňte prosím nájezd i popis práce.');
                 return;
             }
-            try {
-                streamRef = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
-                });
-                video.srcObject = streamRef;
-                video.play();
-                isStreaming = true;
-                document.getElementById('netStatus').innerText = "ONLINE / SYNC ACTIVE";
-                document.getElementById('netStatus').className = "text-[9px] text-emerald-400 font-mono tracking-widest mt-0.5";
-                document.getElementById('streamBtn').innerText = "⏹️ ODPOJIT OD SÍTĚ";
-            } catch (err) {
-                console.error(err);
-                document.getElementById('aiStatusText').innerText = '"Chyba inicializace kamery. Spouštím nouzový lokální režim..."';
-            }
-        }
 
-        function closeCloudBridge() {
-            isStreaming = false;
-            if (streamRef) streamRef.getTracks().forEach(t => t.stop());
-            video.srcObject = null;
-            document.getElementById('streamBtn').innerText = "🌀 RESETOVAT / SYNC ON-LINE MOST";
-            document.getElementById('netStatus').innerText = "OFFLINE / DISCONNECTED";
-            document.getElementById('netStatus').className = "text-[9px] text-rose-500 font-mono tracking-widest mt-0.5";
-        }
+            const logs = getLogs();
+            const newLog = {
+                km: parseInt(kmInput.value),
+                desc: descInput.value,
+                date: new Date().toLocaleDateString('cs-CZ')
+            };
 
-        function startTelemetrySimulation() {
-            setInterval(() => {
-                const fusion = (92 + Math.random() * 4).toFixed(1);
-                const geo = (41 + Math.random() * 1).toFixed(1);
-                const demand = (60 + Math.random() * 4).toFixed(1);
-                const hvdc = (72 + Math.random() * 2).toFixed(1);
-                document.getElementById('fusionOutput').innerText = `${fusion} GW`;
-                document.getElementById('geoOutput').innerText = `${geo} GW`;
-                document.getElementById('localDemand').innerText = `${demand}%`;
-                document.getElementById('hvdcFlow').innerText = `${hvdc} GW`;
-            }, 2500);
-        }
-    </script>
-</body>
-</html>
+            logs.push(newLog);
+            localStorage.setItem('focus_service_logs', JSON.stringify(logs));
+            
+            kmInput.value = '';
+            descInput.value = '';
+            renderLogs();
+            updateMaintenanceIntervals();
+        });
+
+        // --- INTERVALY ÚDRŽBY ---
+        function updateMaintenanceIntervals() {
+            const logs = getLogs();
+            const currentKm = logs.r
